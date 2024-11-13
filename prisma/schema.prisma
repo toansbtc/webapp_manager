@@ -1,0 +1,46 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["catho_schema"]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model account_role {
+  user_token String[] @db.Char
+  role       Int
+  is_active  Boolean
+
+  @@ignore
+  @@schema("catho_schema")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model image_path {
+  id         Int      @default(1)
+  avatar_img String?  @db.Char
+  user_token String[] @db.Char
+
+  @@ignore
+  @@schema("catho_schema")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model infor {
+  user_token    String[]  @db.Char
+  birth_day     DateTime? @db.Date
+  name          String[]  @db.Char
+  number_phone  String[]  @db.Char
+  address       String[]  @db.Char
+  situation     String[]  @db.Char
+  job           String[]  @db.Char
+  position      String[]  @db.Char
+  self_introduc String[]  @db.Char
+
+  @@ignore
+  @@schema("catho_schema")
+}

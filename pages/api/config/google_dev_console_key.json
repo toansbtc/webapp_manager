@@ -1,0 +1,10 @@
+{
+    "web": {
+        "client_id": "1034330787129-m5m9egcud9u7ripsis9m27euc0rk8dde.apps.googleusercontent.com",
+        "project_id": "unified-academy-437707-s0",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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"
+    }
+}
