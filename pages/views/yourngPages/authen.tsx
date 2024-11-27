@@ -4,11 +4,11 @@ import { useState, useEffect, use } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { onAuthStateChanged, signInWithPopup } from "firebase/auth";
-import { auth, faceBookProvider, googleprovider, user } from "./api/config/fireBase"
+import { auth, faceBookProvider, googleprovider, user } from "../../api/config/fireBase"
 import { useDispatch, useSelector } from "react-redux";
 
 import { browserLocalPersistence, setPersistence } from 'firebase/auth';
-import { getItemSession, key_user, setItemSession } from "./api/Function/sessionFunction";
+import { getItemSession, key_user, setItemSession } from "../../api/Function/sessionFunction";
 import { current } from "@reduxjs/toolkit";
 
 const inter = Inter({ subsets: ["vietnamese"] });

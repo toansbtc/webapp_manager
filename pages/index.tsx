@@ -1,18 +1,28 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Head from "next/head";
 import Image from 'next/image'
 import router, { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { auth } from './api/config/fireBase';
+import Active from './views/commonPages/active';
+import Home from './views/commonPages/home';
+import Yourng from './views/yourngPages';
+import { prisma_sql } from './api/DB/PostgreSQL';
+import axios from 'axios';
 
+const page = 'home' || 'active' || 'yourng'
 export default function index() {
   const route = useRouter();
   const [user, setUser] = useState('Anonymous')
+  const [link, setLink] = useState<typeof page>('home')
   const [opneImage, setOpenImage] = useState(false)
   const [currentImageURL, setCurrentImageURL] = useState('')
   const [image, setImage] = useState(['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s',])
   const [video, setVideo] = useState(['https://www.youtube.com/watch?v=ep1_odv7PUY', 'https://www.youtube.com/watch?v=ep1_odv7PUY'])
 
+  useEffect(() => {
+    axios.post('/api/DB/PostgreSQL',)
+  }, [])
 
   const showElement = (id) => {
     const element = document.getElementById(id)
@@ -90,45 +100,47 @@ export default function index() {
         <div className="navbar-collapse collapse " id="navbarCollapse" >
           <ul className="navbar-nav ms-auto me-auto">
             <li className="nav-item active">
-              <a className="nav-link" href="#">Home</a>
+              <a className="nav-link" onClick={() => setLink('home')}>Home</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Link</a>
+              <a className="nav-link" onClick={() => setLink('active')}>Active</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Disabled</a>
+              <a className="nav-link" onClick={() => setLink('yourng')}>Yourng</a>
             </li>
           </ul>
-          <div className="mr-auto justify-content-between" style={{ paddingRight: 10 }}>
+          {link === 'yourng' && (
+            <div className="mr-auto justify-content-between" style={{ paddingRight: 10 }}>
 
-            <div className="dropdown">
-              <text className='text-white' style={{ fontSize: 18, fontFamily: 'cursive' }}>{user !== '' ? `${user}` : ''}</text>
-              <button
-                className="btn bg-dark dropdown-toggle"
-                style={{ color: 'white' }}
-                type="button"
-                id="userDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                onClick={() =>
-                  showElement('userLogin')}
-              >
-              </button>
+              <div className="dropdown">
+                <text className='text-white' style={{ fontSize: 18, fontFamily: 'cursive' }}>{user !== '' ? `${user}` : ''}</text>
+                <button
+                  className="btn bg-dark dropdown-toggle"
+                  style={{ color: 'white' }}
+                  type="button"
+                  id="userDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  onClick={() =>
+                    showElement('userLogin')}
+                >
+                </button>
 
-              <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" id="userLogin">
-                <li onClick={() => route.push('/authen')}>
-                  Login
-                </li>
-                <li onClick={() => {
-                  signOut(auth);
-                  sessionStorage.clear();
-                  router.replace('/')
-                }}>
-                  Logout
-                </li>
-              </ul>
+                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" id="userLogin">
+                  <li onClick={() => route.push('/views/yourngPages/authen', '/authen')}>
+                    Login
+                  </li>
+                  <li onClick={() => {
+                    signOut(auth);
+                    sessionStorage.clear();
+                    router.replace('/')
+                  }}>
+                    Logout
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
       </nav>
@@ -136,83 +148,15 @@ export default function index() {
 
       {/* Main Layout */}
       <div className="container-fluid mt-5 vh-100">
-        <div className="row">
-          {/* Left Side */}
-          <div className="  col-md-2 col-2 d-none d-md-block position-fixed mt-5" style={{ marginTop: '10%', top: '0', left: '0', height: '100vh', width: '16.6%', paddingLeft: 0 }}>
-            <div className="pt-3 bg-light border rounded h-100 ">
-
-              <div style={{ height: '70%' }}>
-                <h5
-                  className="text-center mb-4"
-                  style={{
-                    fontSize: '1.5rem',        // Larger font size
-                    fontWeight: 'bold',        // Make it bold
-                    color: '#ffffff',          // White text color
-                    backgroundColor: '#ff5733', // Bright orange background for contrast
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Add shadow for depth
-                    padding: 0
-                  }}
-                >
-                  this is side image
-                </h5>
-                <div style={{ overflowY: 'auto', display: 'flex', whiteSpace: 'nowrap' }} >
-                  {
-                    image.map((imageURL, index) =>
-                      <Image src={imageURL} unoptimized width={100} height={100} style={{ width: '100%', paddingBottom: 10 }} alt='image' onClick={() => {
-                        setOpenImage(true)
-                        setCurrentImageURL(imageURL)
-                        // <div style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0 }}>
-                        //   <Image src={imageURL} width={100} height={100} alt='image' style={{ width: '100%', height: '100%' }} />
-                        // </div>
-                      }} />
-                    )
-                  }
-                </div>
-                <div style={{ position: 'fixed', top: '73%', width: '15.2%' }}>
-                  <button style={{ width: '100%' }}>hello bottom</button>
-                </div>
-              </div>
-              <div style={{ border: 4, borderColor: 'ActiveCaption', height: '30%' }}>
-                this is calender
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content Section */}
-          <div className="col-12 col-md-8 offset-md-2 mt-3">
-            <div className="pt-4 p-2 bg-white border rounded shadow-sm ">
-              <h2>Main Content Area</h2>
-              <p>
-                This is the main content area. You can put articles, images,
-                videos, or anything else here.
-              </p>
-              <p>
-                Bootstrap helps in making the layout responsive. The left and
-                right advertisements are only visible on medium to large
-                screens.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Side */}
-          <div className="col-md-2  col-2 d-none d-md-block position-fixed mt-5" style={{ top: '0', right: '0', height: '100vh', width: '16.6%', paddingRight: 0 }}>
-            <div className="pt-4 bg-light border rounded h-100">
-              {
-                video.map((videoURL, index) =>
-                  <iframe
-                    src={videoURL.replace('watch?v=', 'embed/')}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    onPlay={() => {
-
-                    }}
-                  />
-                )
-              }
-
-            </div>
-          </div>
-        </div>
+        {link === 'active' && (
+          <Active />
+        )}
+        {link === 'home' && (
+          <Home />
+        )}
+        {link === 'yourng' && (
+          <Yourng />
+        )}
       </div>
 
       {/* open view image full screen */}
@@ -248,5 +192,3 @@ export default function index() {
     </>
   )
 }
-
-

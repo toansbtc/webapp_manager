@@ -1,15 +1,15 @@
 import { google } from 'googleapis';
 import { NextApiRequest, NextApiResponse } from 'next';
 import React from 'react'
-import { excute_mySQL } from './config/connect_DB';
+import { excute_mySQL } from '../config/connect_DB';
 import formidable from 'formidable'
 import fs from 'fs'
 import path from 'path';
 
 
-import configdrive from './config/google_drive_key.json'
-import configauth from './config/google_dev_console_key.json'
-import { handle } from './Function/googleDriveFunction';
+import configdrive from '../config/google_drive_key.json'
+import configauth from '../config/google_dev_console_key.json'
+import { handle } from '../Function/googleDriveFunction';
 export const config = {
     api: {
         bodyParser: false, // Disable default body parser

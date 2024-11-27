@@ -2,7 +2,7 @@ import { updateProfile } from 'firebase/auth'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import axios from 'axios'
-import { excute_mySQL } from '../api/config/connect_DB'
+import { excute_mySQL } from '../../api/config/connect_DB'
 
 export default function profile({ user }) {
     const [displayName, setDisplayName] = useState('')
