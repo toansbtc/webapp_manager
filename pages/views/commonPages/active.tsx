@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { auth } from '../../api/config/fireBase';
 import { getItemSession } from '../../api/Function/sessionFunction';
+import Profile from "../components/profile"
 
 const page = 'home' || 'profile' || 'ballot'
 export default function active() {
@@ -133,16 +134,7 @@ export default function active() {
             {/* Main Content Section */}
             <div className="col-12 col-md-10 offset-md-2 mt-3">
                 <div className="pt-4 p-2 bg-white border rounded shadow-sm ">
-                    <h2>Main Content Area</h2>
-                    <p>
-                        This is the main content area. You can put articles, images,
-                        videos, or anything else here.
-                    </p>
-                    <p>
-                        Bootstrap helps in making the layout responsive. The left and
-                        right advertisements are only visible on medium to large
-                        screens.
-                    </p>
+                    <Profile user={undefined} />
                 </div>
             </div>
 

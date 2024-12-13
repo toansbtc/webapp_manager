@@ -32,7 +32,7 @@ export default function profile({ user }) {
             if (file)
                 formData.append('file_image', file)
 
-            axios.post('/api/gg_drive', formData).then((response) => {
+            axios.post('/api/controller/gg_drive', formData).then((response) => {
                 console.log(response)
                 const url_upload = response.data.url;
                 setUrlImageDrive(url_upload);

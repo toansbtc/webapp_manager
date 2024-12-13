@@ -225,3 +225,13 @@
     transform: rotate(0deg);
   }
 }
+
+.hidden {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -30,30 +30,38 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                 console.log(err)
             const file = Array.isArray(files.file_image) ? files.file_image[0] : files.file_image
 
-
-            // const auth = new google.auth.GoogleAuth({
-            //     keyFile: path.join(process.cwd(), 'pages/api/config/google_drive_key.json'),
-            //     scopes: ['https://www.googleapis.com/auth/drive.file']
-            // });
-
-            // const driveService = google.drive({ version: 'v3', auth })
-            // const fileStream = fs.createReadStream(file.filepath);
-
-            // const response = await driveService.files.create({
-            //     requestBody: {
-            //         name: file.originalFilename,
-            //         mimeType: file.mimetype
-            //     },
-            //     media: {
-            //         mimeType: file.mimetype,
-            //         body: fileStream
-            //     },
-            // });
-
-            const response = await handle(file)
+            // const response = await handle(file)
             // console.log('return data', response.data.id)
-            res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
+            // res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
 
+            const auth = new google.auth.GoogleAuth({
+                keyFile: path.join(process.cwd(), process.env.GOOGLE_DRIVE_KEY_PATH),
+                scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/drive.file']
+            });
+
+            const driveService = google.drive({ version: 'v3', auth })
+            const fileStream = fs.createReadStream(file.filepath);
+
+            const response = await driveService.files.create({
+                requestBody: {
+                    name: file.originalFilename,
+                    mimeType: file.mimetype
+                },
+                media: {
+                    mimeType: file.mimetype,
+                    body: fileStream
+                },
+            });
+
+            const oauth2 = google.oauth2({
+                auth: auth,
+                version: 'v2',
+            });
+
+            const userInfo = await oauth2.userinfo.get();
+            console.log('Authenticated User:', userInfo.data.email);
+
+            res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
 
         })
 

@@ -1,37 +1,62 @@
 import React, { useEffect, useState } from 'react'
 import Head from "next/head";
 import Image from 'next/image'
-import router, { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
-import { auth } from './api/config/fireBase';
 import Active from './views/commonPages/active';
 import Home from './views/commonPages/home';
 import Yourng from './views/yourngPages';
-import { prisma_sql } from './api/DB/PostgreSQL';
+// import { prisma_sql } from './api/DB/PostgreSQL';
 import axios from 'axios';
+import Navbar from './views/components/navbar';
+import { setInterval } from 'timers';
 
-const page = 'home' || 'active' || 'yourng'
+const page = 'home' || 'active' || 'young'
 export default function index() {
-  const route = useRouter();
-  const [user, setUser] = useState('Anonymous')
+
+
+
+  const [isScrolled, setIsScrolled] = useState(false);
   const [link, setLink] = useState<typeof page>('home')
-  const [opneImage, setOpenImage] = useState(false)
-  const [currentImageURL, setCurrentImageURL] = useState('')
-  const [image, setImage] = useState(['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnixOANZkzqBvx11kY0RUPxmRlhOfSwdebNA&s',])
-  const [video, setVideo] = useState(['https://www.youtube.com/watch?v=ep1_odv7PUY', 'https://www.youtube.com/watch?v=ep1_odv7PUY'])
+  const [imageList, setImageList] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800', 'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800', 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
+  ])
+  const [indexImage, setIndexImage] = useState(0);
+  // const [opneImage, setOpenImage] = useState(false)
+  // const [currentImageURL, setCurrentImageURL] = useState('')
+  // const [video, setVideo] = useState(['https://www.youtube.com/watch?v=ep1_odv7PUY', 'https://www.youtube.com/watch?v=ep1_odv7PUY'])
+
+
+
+
+  let touchStartX = 0;
+
+  const setLinkFromNavbar = (link: typeof page) => {
+    setLink(link)
+  }
 
   useEffect(() => {
-    axios.post('/api/DB/PostgreSQL',)
-  }, [])
+    const interval = setInterval(() => {
+      if (indexImage < imageList.length - 1)
+        setIndexImage(indexImage + 1)
+      else if (indexImage == imageList.length - 1)
+        setIndexImage(0);
+    }, 3000)
+    const handleScroll = () => {
+      const triggerHeight = window.innerHeight / 1.5;
 
-  const showElement = (id) => {
-    const element = document.getElementById(id)
-    if (element.classList.contains('show')) {
-      element.classList.remove('show');
-    } else {
-      element.classList.add('show');
-    }
-  }
+      setIsScrolled(window.scrollY > triggerHeight);
+    };
+
+    // Attach scroll event listener
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up the event listener on unmount
+    interval;
+    return () => {
+      // clearInterval(interval)
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <>
@@ -42,125 +67,96 @@ export default function index() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* Navbar */}
-      {/* <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
+      {link === "home" ? (
+        <header className="position-relative">
+          {/* Dynamic class applied for scroll effect */}
+          <div
+            onTouchStart={(e) => {
+              touchStartX = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              const touchEndX = e.changedTouches[0].clientX;
+              if (touchStartX - touchEndX > 50) {
+                // Detect swipe left
+                if (indexImage < imageList.length - 1)
+                  setIndexImage(indexImage + 1)
+              } else if (touchEndX - touchStartX > 50) {
+                // Detect swipe right (optional)
+                if (0 < indexImage && indexImage <= imageList.length - 1)
+                  setIndexImage(indexImage - 1)
+              }
+            }}
+            style={{
+              height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+              backgroundColor: '#000',
+            }}
+            className={` bg-image ${isScrolled ? 'scrolled' : ''}`}>
 
-            <span className='row text-center justify-content-between align-content-center'>
-              <Image src={'/bg.jpg'} width={50} height={50} className='col' alt='logo' />
-              <div className='col h-100 text-center '>MyWebsite</div>
-            </span>
-          </a>
-
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">
-                  Home
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Features
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Pricing
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav> */}
-
-
-      <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <div className="navbar-brand" >
-          <button className='mr-1 btn '
-            onClick={() => route.push('/authen')}
-          >
+            <button className='icon-right' onClick={() => {
+              if (indexImage < imageList.length - 1)
+                setIndexImage(indexImage + 1)
+            }}>
+              {">"}
+            </button>
+            <button className='icon-left' onClick={() => {
+              if (0 < indexImage && indexImage <= imageList.length - 1)
+                setIndexImage(indexImage - 1)
+            }}>
+              {"<"}
+            </button>
 
 
-            <Image src={'/churchs.jpeg'} width={55} height={50} alt='Home icon' className='rounded-circle m-lg-0' />
-            <span className='text-white' style={{ marginRight: 10 }}>Logo home</span>
-          </button>
-        </div>
-        <button className="navbar-toggler" type="button"
-          onClick={() => showElement('navbarCollapse')}
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="navbar-collapse collapse " id="navbarCollapse" >
-          <ul className="navbar-nav ms-auto me-auto">
-            <li className="nav-item active">
-              <a className="nav-link" onClick={() => setLink('home')}>Home</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" onClick={() => setLink('active')}>Active</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" onClick={() => setLink('yourng')}>Yourng</a>
-            </li>
-          </ul>
-          {link === 'yourng' && (
-            <div className="mr-auto justify-content-between" style={{ paddingRight: 10 }}>
+            <Image
+              unoptimized
+              src={imageList[indexImage]}
+              width={200}
+              height={200}
+              alt="image"
+              style={{ width: '100%', height: '100%', transition: 'transform 0.5s ease', }}
+            />
 
-              <div className="dropdown">
-                <text className='text-white' style={{ fontSize: 18, fontFamily: 'cursive' }}>{user !== '' ? `${user}` : ''}</text>
-                <button
-                  className="btn bg-dark dropdown-toggle"
-                  style={{ color: 'white' }}
-                  type="button"
-                  id="userDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  onClick={() =>
-                    showElement('userLogin')}
-                >
-                </button>
-
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" id="userLogin">
-                  <li onClick={() => route.push('/views/yourngPages/authen', '/authen')}>
-                    Login
-                  </li>
-                  <li onClick={() => {
-                    signOut(auth);
-                    sessionStorage.clear();
-                    router.replace('/')
-                  }}>
-                    Logout
-                  </li>
-                </ul>
-              </div>
+            <div className='dotsContainer '>
+              {imageList.map((_, index) => (
+                <span
+                  key={index}
+                  className='dot'
+                  style={{
+                    backgroundColor: indexImage === index ? '#333' : '#ddd',
+                  }}
+                  onClick={() => setIndexImage(index)}
+                />
+              ))}
             </div>
-          )}
-        </div>
 
-      </nav>
 
+          </div>
+          <Navbar setLink={setLinkFromNavbar} style={!isScrolled ? "bg-transparent" : "bg-black"} />
+        </header>
+      ) : (
+        <Navbar setLink={setLinkFromNavbar} style={"bg-black"} />
+      )}
 
       {/* Main Layout */}
-      <div className="container-fluid mt-5 vh-100">
+      <div className="container-fluid">
         {link === 'active' && (
           <Active />
         )}
         {link === 'home' && (
-          <Home />
+          <div className={`home-container ${isScrolled ? 'visible' : ''}`}>
+            <Home />
+          </div>
         )}
-        {link === 'yourng' && (
+        {link === 'young' && (
           <Yourng />
         )}
       </div>
 
+
+
+
+
       {/* open view image full screen */}
-      {opneImage && (
+      {/* {opneImage && (
         <div
           className="modal show"
           style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)' }}
@@ -188,7 +184,7 @@ export default function index() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   )
 }

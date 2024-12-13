@@ -11,54 +11,61 @@ datasource db {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model account_role {
-  user_token String[] @unique @db.Char
   role       Int
   is_active  Boolean
+  user_token String  @id @db.VarChar(255)
 
   @@schema("catho_schema")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model image_path {
-  id         Int      @unique @default(1)
-  avatar_img String?  @db.Char
-  user_token String[] @db.Char
+  image_path    String?
+  id_image_path Int             @id @unique @default(autoincrement())
+  farther_intro farther_intro[]
+  infor         infor[]
+  intro_home    intro_home[]
 
   @@schema("catho_schema")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model infor {
-  id            Int       @unique @default(1)
-  user_token    String[]  @db.Char
-  birth_day     DateTime? @db.Date
-  name          String[]  @db.Char
-  number_phone  String[]  @db.Char
-  address       String[]  @db.Char
-  situation     String[]  @db.Char
-  job           String[]  @db.Char
-  position      String[]  @db.Char
-  self_introduc String[]  @db.Char
+  birth_day         DateTime?   @db.Date
+  name              String[]    @db.Char
+  number_phone      String[]    @db.Char
+  address           String[]    @db.Char
+  situation         String[]    @db.Char
+  job               String[]    @db.Char
+  position          String[]    @db.Char
+  self_introduc     String[]    @db.Char
+  id_avata_img_path Int?
+  user_token        String      @db.VarChar(255)
+  id                Int         @id @unique @default(autoincrement())
+  image_path        image_path? @relation(fields: [id_avata_img_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
 
   @@schema("catho_schema")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model farther_intro {
-  name         String?   @db.Char
-  time_start   DateTime? @db.Date
-  office       String?   @db.Char
-  introduction String?   @db.Char
-  id           Int       @unique @default(autoincrement())
+  name          String?     @db.VarChar(255)
+  time_start    DateTime?   @db.Date
+  office        String?     @db.VarChar(255)
+  introduction  String?
+  id            Int         @id @default(autoincrement())
+  id_image_path Int?
+  image_path    image_path? @relation(fields: [id_image_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
 
   @@schema("catho_schema")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model intro_home {
-  image_path     String[] @db.Char
-  introduct_text String[] @db.Char
-  id             Int      @unique @default(autoincrement())
+  id            Int         @id @default(autoincrement())
+  id_image_path Int?
+  introduct     String?
+  image_path    image_path? @relation(fields: [id_image_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
 
   @@schema("catho_schema")
 }
