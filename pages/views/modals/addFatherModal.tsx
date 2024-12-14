@@ -1,11 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import action from '@/pages/api/DB/actionDB';
 import axios from 'axios';
 
-export default function addFatherModal({ controlModal }) {
+export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
   const [imageURL, setImageURL] = useState('')
   const [imagePreview, setImagePreview] = useState(null);
+
+
+  useEffect(() => {
+    if (fatherIntro) {
+      setFormData(fatherIntro)
+    }
+    console.log(fatherIntro.image_path)
+  }, [])
 
 
   const [formData, setFormData] = useState({
@@ -48,15 +56,7 @@ export default function addFatherModal({ controlModal }) {
 
 
     try {
-      // console.log(formData)
-      // const image_path = formData.image ? "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800" : "";
-      // const createImage_path = await axios.post("/api/DB/CRUDimagePath", { "action": action.CREATE, "data": { "image_path": image_path } })
 
-
-      // console.log(createImage_path.data)
-
-      // let idImagePath = null;
-      // createImage_path.status === 200 ? idImagePath = createImage_path.data.id_image_path : "";
 
       const data = {
         'name': formData.name,
@@ -66,15 +66,36 @@ export default function addFatherModal({ controlModal }) {
         "image_path": "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
       }
 
-      const createFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.CREATE, "data": data })
+      if (fatherIntro.id) {
 
+        fatherIntro.name = formData.name
+        fatherIntro.time_start = formData.time_start
+        fatherIntro.office = formData.office
+        fatherIntro.introduction = formData.introduction
+        fatherIntro.image_path = formData.image
 
-      if (createFatherIntro.status === 200) {
-        alert('Form submitted successfully!');
-        setFormData({ name: '', time_start: '', office: '', introduction: '', image: null });
-      } else {
-        alert('Error submitting the form.');
+        const updateFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": fatherIntro })
+        if (updateFatherIntro.status === 200) {
+          alert('Chỉnh sửa thành công!');
+          setFormData({ name: '', time_start: '', office: '', introduction: '', image: null });
+        } else {
+          alert('Error submitting the form.');
+        }
       }
+      else {
+        const createFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.CREATE, "data": data })
+        if (createFatherIntro.status === 200) {
+          alert('Thêm mới thành công!');
+          setFormData({ name: '', time_start: '', office: '', introduction: '', image: null });
+        } else {
+          alert('Error submitting the form.');
+        }
+      }
+
+
+
+
+
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while submitting the form.');
@@ -96,7 +117,7 @@ export default function addFatherModal({ controlModal }) {
               <button
                 type="button"
                 className="btn-close"
-                onClick={() => controlModal(false)}
+                onClick={() => { controlModal(false), loadList(); }}
                 aria-label="Close"
               ></button>
             </div>
@@ -105,11 +126,11 @@ export default function addFatherModal({ controlModal }) {
               <form onSubmit={handleSubmit} className="container mt-4">
 
                 <div className="mb-3">
-                  {imagePreview && (
+                  {imagePreview || fatherIntro.image_path && (
                     <div className="mb-3">
                       <label className="form-label">Image Preview:</label>
                       <div>
-                        <img src={imagePreview} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
+                        <Image unoptimized width={200} height={200} src={fatherIntro.image_path ? fatherIntro.image_path : imagePreview} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
                       </div>
                     </div>
                   )}
@@ -121,7 +142,7 @@ export default function addFatherModal({ controlModal }) {
                     accept="image/*"
                     onChange={handleImageChange}
                     className="form-control"
-                    required
+                    {...fatherIntro.id ? null : require}
                   />
                 </div>
 
@@ -182,7 +203,7 @@ export default function addFatherModal({ controlModal }) {
 
 
 
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">{fatherIntro.id ? "Cập nhật" : "Thêm mới"}</button>
               </form>
             </div>
           </div>

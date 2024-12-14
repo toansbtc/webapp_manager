@@ -64,7 +64,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                         },
                         data: {
                             name: formData.name,
-                            time_start: formData.time_start,
+                            time_start: new Date(formData.time_start),
                             office: formData.office,
                             introduction: formData.introduction,
                             // id_image_path: formData.id_image_path,
