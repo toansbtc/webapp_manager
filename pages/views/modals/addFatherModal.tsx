@@ -91,11 +91,6 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
           alert('Error submitting the form.');
         }
       }
-
-
-
-
-
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while submitting the form.');
@@ -189,9 +184,11 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
                 <div className="mb-3">
                   <label htmlFor="address" className="form-label">introduction:</label>
-                  <input
-                    multiple
-                    type="text"
+                  <textarea
+                    // maxLength={250}
+                    aria-valuemax={100}
+                    style={{ width: '100%', height: 170 }}
+                    aria-multiline
                     id="introduction"
                     name="introduction"
                     value={formData.introduction}

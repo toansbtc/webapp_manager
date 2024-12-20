@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image';
 import axios from 'axios';
 import addFatherModal from '../modals/addFatherModal';
@@ -6,13 +6,18 @@ import AddFatherModal from '../modals/addFatherModal';
 import actionDB from "../../api/DB/actionDB"
 import { prisma } from '@/pages/api/DB/prisma';
 import { handle } from '@/pages/api/Function/googleDriveFunction';
+import Quill_editor from '../components/quill_editor';
+import 'react-quill/dist/quill.snow.css';
+
+
 
 export default function home() {
 
     const [modalAddFarther, setmodalAddFarther] = useState(false)
-    const [description, setDescription] = useState('')
+    const [description, setDescription] = useState<any>({})
     const [inforlist, setInforList] = useState([])
     const [fatherInfor, setFatherInfor] = useState({})
+    const [editInfor, setEditInfor] = useState(false)
 
 
     // useEffect(() => {
@@ -31,10 +36,28 @@ export default function home() {
     //     })
     // }, [])
 
-
     useEffect(() => {
+        // const getIntroSQL = "delete FROM intro_home "
+        // axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
         loadDataFatherInforList();
-    }, [])
+        loadDataIntroduct();
+    }, [editInfor])
+
+    const loadData = (data) => {
+        console.log("contentda", data)
+        setDescription(data)
+    }
+
+    const loadDataIntroduct = async () => {
+        const getIntroSQL = "SELECT * FROM intro_home where introduct not like 'image%'  LIMIT 1"
+        await axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
+            .then((result) => {
+                if (result.status === 200)
+                    setDescription(result.data[0] ? result.data[0] : { "introduct": '' })
+                console.log("data introduct", result.data)
+            })
+
+    }
 
     const loadDataFatherInforList = () => {
         axios.post('/api/DB/CRUDfatherInfor', { "action": actionDB.GETLISTDATA })
@@ -43,7 +66,7 @@ export default function home() {
                     const data = result.data;
                     const fatherinfor = []
                     Array.from(data).map((value: any, index) => {
-                        console.log("data list father:", value)
+
                         fatherinfor.push({
                             "image_path": value.image_path.image_path,
                             "name": value.name,
@@ -62,25 +85,32 @@ export default function home() {
     const controlModal = (option) => {
         setmodalAddFarther(option)
     }
+    const openCloseQuill = (option) => {
+        setEditInfor(option);
+    }
+
+
 
     return (
         <div style={styles.pageContainer}>
-            <div style={styles.mainImageContainer}>
-                {/* <Image
-                    unoptimized
-                    src="/bg.jpg"
-                    alt="Main Feature"
-                    width={800}
-                    height={200}
-                    style={styles.mainImage}
-                /> */}
-                <p style={styles.mainDescription}>
-                    {description !== '' ? description : 'Empty'}
-                </p>
+            <div style={styles.mainContainer}>
+
+                <Image style={{ position: 'fixed', top: 0, right: 0 }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditInfor(true)} />
+                {
+                    editInfor ?
+                        (
+                            <Quill_editor data={description} openCloseQuill={openCloseQuill} loadData={loadData} />
+                        )
+                        :
+                        (
+                            <div id='innerHTML' dangerouslySetInnerHTML={{ __html: description ? description.introduct : '' }}></div>
+                        )
+                }
+
             </div>
 
-            {/* Grid of Images and Descriptions */}
-            <div style={styles.gridContainer}>
+            {/* main content */}
+            <div style={styles.gridContainer} >
                 {inforlist.map((item, index) =>
                 (
                     <div key={index} className="container py-5">
@@ -95,18 +125,19 @@ export default function home() {
                                 style={styles.gridImage}
                                 className="card-img-top"
                             />
-                            <div className="card-body text-start">
-                                <h5 className='card-title fw-bold'>Tên: {item.name}</h5>
-                                <p className='card-subtitle mb-3 text-muted'><strong>Chức vụ: {item.office}</strong></p>
-                                <p className='card-text'><strong>Thời gian bắt đầu: {item.time_start}</strong></p>
-                                <p className='card-text'><strong>Giới thiệu chung : {item.introduction}</strong></p>
-                                <div className='row text-center'>
+                            <div className="card-body text-start bg-primary-subtle">
+                                <h4 className='card-text'><strong>Tên: {item.name}</strong></h4>
+                                <h5 className='card-text'>Chức vụ: {item.office}</h5>
+                                <h5 className='card-text'>Thời gian bắt đầu: {item.time_start}</h5>
+                                <h5 className='card-text'>Giới thiệu chung :
+                                    <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word", width: "100%", height: 100, margin: 0 }}>{item.introduction}</pre>
+                                </h5>
 
+                                <div className='row text-center'>
                                     {/* update data infor  */}
                                     <div style={{ width: '100%', backgroundColor: 'rgb(33 179 110)' }} onClick={() => {
                                         setFatherInfor(item)
                                         setmodalAddFarther(true)
-
                                     }}>
                                         <span>Update</span>
                                     </div>
@@ -146,13 +177,24 @@ export default function home() {
 // CSS-in-JS styles
 const styles = {
     pageContainer: {
-        padding: '20px',
-        maxWidth: '1200px',
+        // padding: '20px',
+        // maxWidth: '1200px',
         margin: '0 auto',
+
+        minHeight: "100vh",
+        // display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(208deg, #161865, #f2d9cad1, #1b4157)",
+        color: "#333",
+
     },
-    mainImageContainer: {
-        marginBottom: '40px',
-        //   textAlign: 'center',
+    mainContainer: {
+        backgroundColor: "white",
+        padding: "10px",
+        borderRadius: "10px",
+        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+        with: '100%',
     },
     mainImage: {
         borderRadius: '10px',
@@ -160,9 +202,12 @@ const styles = {
         height: '400px',
     },
     mainDescription: {
-        marginTop: '20px',
+        // marginTop: '20px',
+        flex: 1,
         fontSize: '1.2em',
         color: '#555',
+        with: '100%',
+        height: '500px'
     },
     gridContainer: {
         textAlign: 'center',
@@ -173,8 +218,8 @@ const styles = {
         alignItems: 'center',
     },
     gridItem: {
-        //   textAlign: 'center',
-        padding: '10px',
+        textAlign: 'center',
+        padding: '5px',
         backgroundColor: '#f9f9f9',
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -185,7 +230,7 @@ const styles = {
         height: 'auto',
     },
     gridDescription: {
-        marginTop: '15px',
+        marginTop: '5px',
         fontSize: '1em',
         color: '#444',
     },

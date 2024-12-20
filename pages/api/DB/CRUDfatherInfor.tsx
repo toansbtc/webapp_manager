@@ -22,6 +22,9 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
             case ActionDB.GETLISTDATA:
                 result = await prisma.farther_intro.findMany(
                     {
+                        orderBy: {
+                            id: 'asc'
+                        },
                         include: { image_path: true }
                     }
                 )

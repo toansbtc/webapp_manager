@@ -35,23 +35,23 @@ export default function index() {
   }
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (indexImage < imageList.length - 1)
-        setIndexImage(indexImage + 1)
-      else if (indexImage == imageList.length - 1)
-        setIndexImage(0);
-    }, 3000)
+    // const interval = setInterval(() => {
+    //   if (indexImage < imageList.length - 1)
+    //     setIndexImage(indexImage + 1)
+    //   else if (indexImage == imageList.length - 1)
+    //     setIndexImage(0);
+    // }, 3000)
+
     const handleScroll = () => {
-      const triggerHeight = window.innerHeight / 1.5;
+      const triggerHeight = window.innerHeight / 1.3;
 
       setIsScrolled(window.scrollY > triggerHeight);
     };
 
-    // Attach scroll event listener
     window.addEventListener('scroll', handleScroll);
 
-    // Clean up the event listener on unmount
-    interval;
+
+
     return () => {
       // clearInterval(interval)
       window.removeEventListener('scroll', handleScroll);
