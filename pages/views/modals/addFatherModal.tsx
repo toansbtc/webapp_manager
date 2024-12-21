@@ -4,8 +4,8 @@ import action from '@/pages/api/DB/actionDB';
 import axios from 'axios';
 
 export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
-  const [imageURL, setImageURL] = useState('')
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
 
   useEffect(() => {
@@ -14,6 +14,14 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
     }
     console.log(fatherIntro.image_path)
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview); // Clean up blob URL
+      }
+    };
+  }, [imagePreview]);
 
 
   const [formData, setFormData] = useState({
@@ -36,26 +44,30 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    setImageFile(file);
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onload = (e) => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
     }
-    setFormData({
-      ...formData,
-      image: e.target.files[0],
-    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     try {
+      let result = null;
+      if (imageFile) {
+
+        const formDataImage = new FormData();
+        formDataImage.append("fileImage", imageFile);
+        formDataImage.append("folderName", "Father");
+        result = await axios.post("/api/controller/gg_drive", formDataImage)
+      }
+
+
 
 
       const data = {
@@ -63,9 +75,10 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
         'time_start': formData.time_start,
         'office': formData.office,
         'introduction': formData.introduction,
-        "image_path": "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "image_path": "" //"https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
       }
-
+      if (result)
+        data.image_path = result.fileId
       if (fatherIntro.id) {
 
         fatherIntro.name = formData.name
@@ -121,11 +134,19 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
               <form onSubmit={handleSubmit} className="container mt-4">
 
                 <div className="mb-3">
-                  {imagePreview || fatherIntro.image_path && (
+                  {imagePreview && (
                     <div className="mb-3">
                       <label className="form-label">Image Preview:</label>
                       <div>
-                        <Image unoptimized width={200} height={200} src={fatherIntro.image_path ? fatherIntro.image_path : imagePreview} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
+                        <img width={200} height={200} src={imagePreview} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
+                      </div>
+                    </div>
+                  )}
+                  {fatherIntro.image_path && !imagePreview && (
+                    <div className="mb-3">
+                      <label className="form-label">Image Preview:</label>
+                      <div>
+                        <img width={200} height={200} src={fatherIntro.image_path} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
                       </div>
                     </div>
                   )}

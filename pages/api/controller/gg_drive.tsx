@@ -1,15 +1,10 @@
 import { google } from 'googleapis';
 import { NextApiRequest, NextApiResponse } from 'next';
-import React from 'react'
-import { excute_mySQL } from '../config/connect_DB';
 import formidable from 'formidable'
 import fs from 'fs'
 import path from 'path';
 
 
-import configdrive from '../config/google_drive_key.json'
-import configauth from '../config/google_dev_console_key.json'
-import { handle } from '../Function/googleDriveFunction';
 export const config = {
     api: {
         bodyParser: false, // Disable default body parser
@@ -20,6 +15,11 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
         return res.status(405).json({ message: 'method not allowed' });
 
     try {
+        const folderName = req.body.folderName
+
+        console.log(req.body)
+
+
         const form = formidable({
             keepExtensions: true,
             multiples: false
@@ -69,16 +69,5 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
         res.status(500).json({ message: error })
         console.log(error)
     }
-    // const { file_image, displayName } = req.body;
-
-
-    // const drive_folder = '1Ds2Gef__GD0ImqxAO2WI8j_E3PeLjkTu';
-
-    // const auth = new google.auth.GoogleAuth({
-    //     keyFile: './config/google_drive_key.json',
-    //     scopes: ['https://www.googleapis.com/auth/drive.file']
-    // })
-    // const drive_service = google.drive({ version: 'v3', auth });
-    // res.send(file_image)
 
 }
