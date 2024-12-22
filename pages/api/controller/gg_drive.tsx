@@ -57,13 +57,13 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                 },
             });
 
-            const oauth2 = google.oauth2({
-                auth: auth,
-                version: 'v2',
-            });
+            // const oauth2 = google.oauth2({
+            //     auth: auth,
+            //     version: 'v2',
+            // });
 
-            const userInfo = await oauth2.userinfo.get();
-            console.log('Authenticated User:', userInfo.data.email);
+            // const userInfo = await oauth2.userinfo.get();
+            // console.log('Authenticated User:', userInfo.data.id);
 
             res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
 

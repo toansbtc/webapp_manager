@@ -21,7 +21,7 @@ export default function navbar({ setLink, style }) {
                 <button className='mr-1 btn '
                     onClick={() => route.push('/authen')}
                 >
-                    <Image src={'/churchs.jpeg'} width={55} height={50} alt='Home icon' className='rounded-circle m-lg-0' />
+                    <Image src={'/church.jpeg'} width={55} height={50} alt='Home icon' className='rounded-circle m-lg-0' />
                     <span className='text-white' style={{ marginRight: 10 }}>Logo home</span>
                 </button>
             </div>

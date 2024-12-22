@@ -49,32 +49,35 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+const data = {
+        'name': formData.name,
+        'time_start': formData.time_start,
+        'office': formData.office,
+        'introduction': formData.introduction,
+        "image_path": "" 
+      }
 
     try {
-      let result = null;
+
       if (imageFile) {
 
         const formDataImage = new FormData();
         formDataImage.append("fileImage", imageFile);
         formDataImage.append("folderName", "Father");
-        result = await axios.post("/api/controller/gg_drive", formDataImage)
+        await axios.post("/api/controller/gg_drive", formDataImage).then((result)=>{
+          if(result.data)
+          {
+            console.log(result)
+            data.image_path=`https://drive.google.com/file/d/${result.data.id}`
+          }
+        })
       }
 
 
 
 
-      const data = {
-        'name': formData.name,
-        'time_start': formData.time_start,
-        'office': formData.office,
-        'introduction': formData.introduction,
-        "image_path": "" //"https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
-      }
-      if (result)
-      {
-        data.image_path = result.fileId
-        console.log(result.fileId)
-      }
+      
+     
       if (fatherIntro.id) {
 
         fatherIntro.name = formData.name
@@ -86,7 +89,6 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
         const updateFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": fatherIntro })
         if (updateFatherIntro.status === 200) {
           alert('Chỉnh sửa thành công!');
-          setFormData({ name: '', time_start: '', office: '', introduction: '', image: null });
         } else {
           alert('Error submitting the form.');
         }

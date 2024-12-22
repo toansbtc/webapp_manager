@@ -60,6 +60,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                 })
                 break;
             case ActionDB.UPDATE:
+                console.log("data",formData.image_path)
                 result = await prisma.farther_intro.update(
                     {
                         where: {
@@ -70,7 +71,6 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                             time_start: new Date(formData.time_start),
                             office: formData.office,
                             introduction: formData.introduction,
-                            // id_image_path: formData.id_image_path,
                             image_path: {
                                 update: {
                                     image_path: formData.image_path
