@@ -10,12 +10,15 @@ export const config = {
         bodyParser: false, // Disable default body parser
     },
 };
+
+const IDFolderFather="1GVDJLe_OeCV52grlVBKbio41b1-eT1Mr";
+
+
 export default async function gg_drive(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST')
         return res.status(405).json({ message: 'method not allowed' });
 
     try {
-        const folderName = req.body.folderName
 
         console.log(req.body)
 
@@ -28,16 +31,16 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
 
             if (err)
                 console.log(err)
-            const file = Array.isArray(files.file_image) ? files.file_image[0] : files.file_image
+            const file = Array.isArray(files.fileImage) ? files.fileImage[0] : files.fileImage
+            console.log(fields)
+            const folderName=Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
 
-            // const response = await handle(file)
-            // console.log('return data', response.data.id)
-            // res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
 
             const auth = new google.auth.GoogleAuth({
                 keyFile: path.join(process.cwd(), process.env.GOOGLE_DRIVE_KEY_PATH),
                 scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/drive.file']
             });
+
 
             const driveService = google.drive({ version: 'v3', auth })
             const fileStream = fs.createReadStream(file.filepath);
@@ -45,7 +48,8 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
             const response = await driveService.files.create({
                 requestBody: {
                     name: file.originalFilename,
-                    mimeType: file.mimetype
+                    mimeType: file.mimetype,
+                    parents:[folderName==="Father"?IDFolderFather:""]
                 },
                 media: {
                     mimeType: file.mimetype,

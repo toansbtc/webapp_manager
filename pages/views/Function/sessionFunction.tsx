@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { auth, user } from "../config/fireBase";
+import { auth, user } from "../../api/config/fireBase";
 import { signOut } from "firebase/auth";
 export const key_user = 'user';
 export function setItemSession(key: string, value, expired: number = 1800) {

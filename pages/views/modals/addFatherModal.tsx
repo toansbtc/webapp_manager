@@ -15,13 +15,6 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
     console.log(fatherIntro.image_path)
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview); // Clean up blob URL
-      }
-    };
-  }, [imagePreview]);
 
 
   const [formData, setFormData] = useState({
@@ -78,7 +71,10 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
         "image_path": "" //"https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
       }
       if (result)
+      {
         data.image_path = result.fileId
+        console.log(result.fileId)
+      }
       if (fatherIntro.id) {
 
         fatherIntro.name = formData.name

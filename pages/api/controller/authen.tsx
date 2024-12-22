@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { executeData } from "../config/connect_DB";
 import { auth, get_error_code } from "../config/fireBase";
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, verifyBeforeUpdateEmail } from "firebase/auth";
-import { data_return } from "../decladeInterface/authenInterface";
+import { data_return } from "../../views/decladeInterface/authenInterface";
 import { useEffect, useState } from "react";
 
 
