@@ -218,6 +218,7 @@ a {
   z-Index: 1;
 }
 
+/* make possition display image in home */
 .dotsContainer {
   display: flex;
   bottom: 0;
@@ -234,6 +235,7 @@ a {
   transition: background-color 0.3s ease;
 }
 
+/* quill css */
 .ql-align-center {
   text-align: center;
 }
@@ -248,4 +250,14 @@ a {
 
 .ql-align-justify {
   text-align: justify;
+}
+
+/* quill render image response */
+#innerHTML img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  /* Ensures images do not overflow */
+  margin: 0 auto;
+  /* Centers the images */
 }

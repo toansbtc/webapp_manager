@@ -4,9 +4,11 @@ import ActionDB from "./actionDB"
 import { where } from "firebase/firestore";
 import { create } from "domain";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+    log: ["query", "info", "warn", "error"],
+})
 
-
+prisma.$connect();
 export default async function prisma_sql(req: NextApiRequest, res: NextApiResponse) {
 
     const formData = req.body.data;
@@ -60,7 +62,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                 })
                 break;
             case ActionDB.UPDATE:
-                console.log("data",formData.image_path)
+                console.log("data", formData)
                 result = await prisma.farther_intro.update(
                     {
                         where: {
@@ -78,7 +80,9 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                             },
                         },
 
-                    })
+                    }
+                )
+                // console.log("this is result of update father infor:", await prisma.$queryRaw`select * from image path`)
                 break;
             case ActionDB.DELETE:
                 result = await prisma.farther_intro.delete({
@@ -95,12 +99,13 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                 break;
         }
 
+
         res.status(200).send(result);
     } catch (error) {
         console.error(`error excute query farther_intro--${action}`, error)
     }
     finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
     }
 }
 

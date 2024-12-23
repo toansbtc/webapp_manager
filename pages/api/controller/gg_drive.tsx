@@ -11,7 +11,7 @@ export const config = {
     },
 };
 
-const IDFolderFather="1GVDJLe_OeCV52grlVBKbio41b1-eT1Mr";
+const IDFolderFather = "1GVDJLe_OeCV52grlVBKbio41b1-eT1Mr";
 
 
 export default async function gg_drive(req: NextApiRequest, res: NextApiResponse) {
@@ -19,10 +19,6 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
         return res.status(405).json({ message: 'method not allowed' });
 
     try {
-
-        console.log(req.body)
-
-
         const form = formidable({
             keepExtensions: true,
             multiples: false
@@ -33,7 +29,7 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                 console.log(err)
             const file = Array.isArray(files.fileImage) ? files.fileImage[0] : files.fileImage
             console.log(fields)
-            const folderName=Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
+            const folderName = Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
 
 
             const auth = new google.auth.GoogleAuth({
@@ -49,7 +45,7 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                 requestBody: {
                     name: file.originalFilename,
                     mimeType: file.mimetype,
-                    parents:[folderName==="Father"?IDFolderFather:""]
+                    parents: [folderName === "Father" ? IDFolderFather : ""]
                 },
                 media: {
                     mimeType: file.mimetype,

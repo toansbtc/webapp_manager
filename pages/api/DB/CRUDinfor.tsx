@@ -3,9 +3,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import ActionDB from "./actionDB"
 import { where } from "firebase/firestore";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+    log: ["query", "info", "warn", "error"],
+})
 
-
+prisma.$connect()
 export default async function prisma_sql(req: NextApiRequest, res: NextApiResponse) {
     const action = req.body.action;
     const formData = req.body.data;
@@ -95,7 +97,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
         console.error(`error excute query infor--${action}`, error)
     }
     finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
     }
 }
 

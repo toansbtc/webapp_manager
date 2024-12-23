@@ -4,8 +4,6 @@ import axios from 'axios';
 import addFatherModal from '../modals/addFatherModal';
 import AddFatherModal from '../modals/addFatherModal';
 import actionDB from "../../api/DB/actionDB"
-import { prisma } from '@/pages/api/DB/prisma';
-import { handle } from '@/pages/api/Function/googleDriveFunction';
 import Quill_editor from '../components/quill_editor';
 import 'react-quill/dist/quill.snow.css';
 
@@ -44,7 +42,7 @@ export default function home() {
     }, [editInfor])
 
     const loadData = (data) => {
-        console.log("contentda", data)
+
         setDescription(data)
     }
 
@@ -54,7 +52,6 @@ export default function home() {
             .then((result) => {
                 if (result.status === 200)
                     setDescription(result.data[0] ? result.data[0] : { "introduct": '' })
-                console.log("data introduct", result.data)
             })
 
     }
@@ -113,7 +110,7 @@ export default function home() {
             <div style={styles.gridContainer} >
                 {inforlist.map((item, index) =>
                 (
-                    <div key={index} className="container py-5">
+                    <div key={index} className="container py-2">
                         <div className="card mx-auto shadow" style={{ maxWidth: 450 }}>
 
                             <Image
@@ -176,22 +173,21 @@ export default function home() {
 
 // CSS-in-JS styles
 const styles = {
-    pageContainer: {
-        // padding: '20px',
-        // maxWidth: '1200px',
+    mainContainer: {
+        padding: "5px",
+        minHeight: "100px",
         margin: '0 auto',
-
-        minHeight: "100vh",
-        // display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(208deg, #161865, #f2d9cad1, #1b4157)",
+        background: "linear-gradient(272deg, #d5d5514f, #d998d440, #a7ff8396)",
         color: "#333",
 
     },
-    mainContainer: {
+    pageContainer: {
+
+        minHeight: "100vh",
         backgroundColor: "white",
-        padding: "10px",
+        // padding: "10px",
         borderRadius: "10px",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
         with: '100%',

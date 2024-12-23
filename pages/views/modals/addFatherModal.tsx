@@ -12,7 +12,9 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
     if (fatherIntro) {
       setFormData(fatherIntro)
     }
-    console.log(fatherIntro.image_path)
+    // axios.post("/api/DB/CRUDfatherInfor", { "action": action.NATIVESQL, "data": { "sql": "select * from image_path" } }).then((data) => {
+    //   console.log("this is data image path", data)
+    // })
   }, [])
 
 
@@ -49,13 +51,13 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-const data = {
-        'name': formData.name,
-        'time_start': formData.time_start,
-        'office': formData.office,
-        'introduction': formData.introduction,
-        "image_path": "" 
-      }
+    const data = {
+      'name': formData.name,
+      'time_start': formData.time_start,
+      'office': formData.office,
+      'introduction': formData.introduction,
+      "image_path": ""
+    }
 
     try {
 
@@ -64,11 +66,10 @@ const data = {
         const formDataImage = new FormData();
         formDataImage.append("fileImage", imageFile);
         formDataImage.append("folderName", "Father");
-        await axios.post("/api/controller/gg_drive", formDataImage).then((result)=>{
-          if(result.data)
-          {
-            console.log(result)
-            data.image_path=`https://drive.google.com/file/d/${result.data.id}`
+        await axios.post("/api/controller/gg_drive", formDataImage).then((result) => {
+          if (result.data) {
+            console.log("data result ", result.data)
+            data.image_path = `https://drive.google.com/file/d/${result.data.fileId}`
           }
         })
       }
@@ -76,15 +77,15 @@ const data = {
 
 
 
-      
-     
+
+
       if (fatherIntro.id) {
 
         fatherIntro.name = formData.name
         fatherIntro.time_start = formData.time_start
         fatherIntro.office = formData.office
         fatherIntro.introduction = formData.introduction
-        fatherIntro.image_path = formData.image
+        fatherIntro.image_path = data.image_path === "" ? formData.image : data.image_path
 
         const updateFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": fatherIntro })
         if (updateFatherIntro.status === 200) {
