@@ -197,6 +197,7 @@ a {
   display: flex;
   align-Items: 'center';
   justify-Content: 'center';
+  text-align: center;
   z-Index: 1;
 }
 
@@ -215,6 +216,7 @@ a {
   display: flex;
   align-Items: center;
   justify-Content: center;
+  text-align: center;
   z-Index: 1;
 }
 

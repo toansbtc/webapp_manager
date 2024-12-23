@@ -4,7 +4,7 @@ import ActionDB from "./actionDB"
 import { where } from "firebase/firestore";
 
 const prisma = new PrismaClient({
-    log: ["query", "info", "warn", "error"],
+    log: ["error"],
 })
 
 prisma.$connect()

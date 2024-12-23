@@ -5,7 +5,7 @@ import { where } from "firebase/firestore";
 import { create } from "domain";
 
 const prisma = new PrismaClient({
-    log: ["query", "info", "warn", "error"],
+    log: ["error"],
 })
 
 prisma.$connect();

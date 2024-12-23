@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import action from '@/pages/api/DB/actionDB';
 import axios from 'axios';
+import { getDrivePath } from '../Function/getDrivePath';
 
 export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
   const [imagePreview, setImagePreview] = useState(null);
@@ -68,8 +69,8 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
         formDataImage.append("folderName", "Father");
         await axios.post("/api/controller/gg_drive", formDataImage).then((result) => {
           if (result.data) {
-            console.log("data result ", result.data)
-            data.image_path = `https://drive.google.com/file/d/${result.data.fileId}`
+            console.log("data result ", result.data);
+            data.image_path = result.data.fileId;
           }
         })
       }
@@ -145,7 +146,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
                     <div className="mb-3">
                       <label className="form-label">Image Preview:</label>
                       <div>
-                        <img width={200} height={200} src={fatherIntro.image_path} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
+                        <img width={200} height={200} src={getDrivePath(fatherIntro.image_path)} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
                       </div>
                     </div>
                   )}

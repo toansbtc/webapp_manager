@@ -6,6 +6,7 @@ import AddFatherModal from '../modals/addFatherModal';
 import actionDB from "../../api/DB/actionDB"
 import Quill_editor from '../components/quill_editor';
 import 'react-quill/dist/quill.snow.css';
+import { useLoading } from "../loadingPages/loadingContext"
 
 
 
@@ -17,22 +18,7 @@ export default function home() {
     const [fatherInfor, setFatherInfor] = useState({})
     const [editInfor, setEditInfor] = useState(false)
 
-
-    // useEffect(() => {
-    //     const name = "dương văn quá"
-    //     const time_start = "04/20/2021"
-    //     const office = "staff"
-    //     const introduction = "a member of team"
-    //     const image_path = "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
-    //     const getsql = 'select * from catho_schema.farther_intro'
-    //     const sql = `insert into catho_schema.farther_intro ("name","time_start","office","introduction","image_path") values ('${name}','${time_start}','${office}','${introduction}','${image_path}')`
-    //     axios.post('/api/DB/PostgreSQL', { sql: getsql }).then((resuilt) => {
-    //         if (resuilt.data) {
-    //             setInforList(resuilt.data)
-    //             console.log(resuilt.data)
-    //         }
-    //     })
-    // }, [])
+    const { setIsLoading } = useLoading();
 
     useEffect(() => {
         // const getIntroSQL = "delete FROM intro_home "
@@ -47,12 +33,21 @@ export default function home() {
     }
 
     const loadDataIntroduct = async () => {
-        const getIntroSQL = "SELECT * FROM intro_home where introduct not like 'image%'  LIMIT 1"
-        await axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
-            .then((result) => {
-                if (result.status === 200)
-                    setDescription(result.data[0] ? result.data[0] : { "introduct": '' })
-            })
+        try {
+            setIsLoading(true)
+            const getIntroSQL = "SELECT * FROM intro_home where introduct not like 'image%'  LIMIT 1"
+            await axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
+                .then((result) => {
+                    if (result.status === 200)
+                        setDescription(result.data[0] ? result.data[0] : { "introduct": '' })
+                })
+
+        } catch (error) {
+            console.log(error)
+        }
+        finally {
+            setIsLoading(false)
+        }
 
     }
 
