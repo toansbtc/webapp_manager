@@ -1,5 +1,6 @@
 import React from "react";
 import { useLoading } from "./loadingContext";
+import styles from "../../../styles/loadingScreen.module.css"
 
 export default function LoadingScreen() {
     const { isLoading } = useLoading();
@@ -23,11 +24,21 @@ export default function LoadingScreen() {
                     fontSize: "24px",
                 }}
             >
-                Loading...
+
+                <div className={styles.dotWave}>
+                    Please wait
+                    <span className={styles.dot}></span>
+                    <span className={styles.dot}></span>
+                    <span className={styles.dot}></span>
+                </div>
             </div>
 
         )
 
     );
 };
+
+const style = {
+
+}
 

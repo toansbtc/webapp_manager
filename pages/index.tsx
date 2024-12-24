@@ -9,6 +9,7 @@ import Yourng from './views/yourngPages';
 import axios from 'axios';
 import Navbar from './views/components/navbar';
 import { setInterval } from 'timers';
+import action from './api/DB/actionDB';
 
 const page = 'home' || 'active' || 'young'
 export default function index() {
@@ -17,14 +18,8 @@ export default function index() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [link, setLink] = useState<typeof page>('home')
-  const [imageList, setImageList] = useState(['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800', 'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800', 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
-  ])
+  const [imageList, setImageList] = useState([])
   const [indexImage, setIndexImage] = useState(0);
-  // const [opneImage, setOpenImage] = useState(false)
-  // const [currentImageURL, setCurrentImageURL] = useState('')
-  // const [video, setVideo] = useState(['https://www.youtube.com/watch?v=ep1_odv7PUY', 'https://www.youtube.com/watch?v=ep1_odv7PUY'])
-
 
 
 
@@ -42,6 +37,10 @@ export default function index() {
     //     setIndexImage(0);
     // }, 3000)
 
+    axios.post("/api/DB/CRUDintroHome", { "action": action.GETDATA }).then((result) => {
+      result.data
+    })
+
     const handleScroll = () => {
       const triggerHeight = window.innerHeight / 1.3;
 
@@ -50,13 +49,16 @@ export default function index() {
 
     window.addEventListener('scroll', handleScroll);
 
-
-
     return () => {
       // clearInterval(interval)
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const addNewImageFile = () => {
+    const idIMG = "";
+    axios.post("/api/DB/CRUDintroHome", { "action": action.CREATE, "data": { "introduct": "image", "image_path": idIMG } })
+  }
 
   return (
     <>
@@ -95,6 +97,9 @@ export default function index() {
             <button className='icon-right' onClick={() => {
               if (indexImage < imageList.length - 1)
                 setIndexImage(indexImage + 1)
+              else if (indexImage == imageList.length - 1)
+                setIndexImage(0)
+
             }}>
               {">"}
             </button>

@@ -67,6 +67,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
         const formDataImage = new FormData();
         formDataImage.append("fileImage", imageFile);
         formDataImage.append("folderName", "Father");
+        formDataImage.append("action", action.CREATE);
         await axios.post("/api/controller/gg_drive", formDataImage).then((result) => {
           if (result.data) {
             console.log("data result ", result.data);

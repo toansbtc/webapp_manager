@@ -34,33 +34,34 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
             case ActionDB.CREATE:
                 result = await prisma.intro_home.create({
                     data: {
-                        // id_image_path: formData.id_image_path,
                         introduct: formData.introduct,
-                        // image_path: {
-                        //     create: {
-                        //         image_path: formData.image_path
-                        //     }
-                        // }
+                        ...(formData.image_path && {
+                            image_path: {
+                                create: {
+                                    image_path: formData.image_path,
+                                },
+                            },
+                        }),
                     },
-                })
+                });
                 break;
             case ActionDB.UPDATE:
                 await prisma.intro_home.update({
                     data: {
-                        // id_image_path: formData.id_image_path,
                         introduct: formData.introduct,
-                        // image_path: {
-                        //     create: {
-                        //         image_path: formData.image_path
-                        //     }
-                        // }
+                        ...(formData.image_path && {
+                            image_path: {
+                                create: {
+                                    image_path: formData.image_path,
+                                },
+                            },
+                        }),
                     },
                     where: {
                         id: formData.id
                     }
                 })
 
-                // result = await prisma.$queryRaw`SELECT * FROM catho_schema.intro_home where introduct not like 'image%'  LIMIT 1`
                 break;
             case ActionDB.DELETE:
                 result = await prisma.intro_home.delete({

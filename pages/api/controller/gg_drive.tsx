@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable'
 import fs from 'fs'
 import path from 'path';
+import action from "../DB/actionDB"
 
 
 export const config = {
@@ -12,6 +13,8 @@ export const config = {
 };
 
 const IDFolderFather = "1GVDJLe_OeCV52grlVBKbio41b1-eT1Mr";
+const IDFolderActive = "";
+const IDFolderYoung = "";
 
 
 export default async function gg_drive(req: NextApiRequest, res: NextApiResponse) {
@@ -30,6 +33,8 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
             const file = Array.isArray(files.fileImage) ? files.fileImage[0] : files.fileImage
             console.log(fields)
             const folderName = Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
+            const actionData = Array.isArray(fields.action) ? fields.action[0] : fields.action
+            const fileID = Array.isArray(fields.fileID) ? fields.fileID[0] : fields.fileID
 
 
             const auth = new google.auth.GoogleAuth({
@@ -41,28 +46,47 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
             const driveService = google.drive({ version: 'v3', auth })
             const fileStream = fs.createReadStream(file.filepath);
 
-            const response = await driveService.files.create({
-                requestBody: {
-                    name: file.originalFilename,
-                    mimeType: file.mimetype,
-                    parents: [folderName === "Father" ? IDFolderFather : ""]
-                },
-                media: {
-                    mimeType: file.mimetype,
-                    body: fileStream
-                },
-            });
+            switch (actionData) {
+                case action.CREATE:
 
-            // const oauth2 = google.oauth2({
-            //     auth: auth,
-            //     version: 'v2',
-            // });
+                    const response = await driveService.files.create({
+                        requestBody: {
+                            name: file.originalFilename,
+                            mimeType: file.mimetype,
+                            parents: [folderName === "Father" ? IDFolderFather : ""]
+                        },
+                        media: {
+                            mimeType: file.mimetype,
+                            body: fileStream
+                        },
+                    });
 
-            // const userInfo = await oauth2.userinfo.get();
-            // console.log('Authenticated User:', userInfo.data.id);
+                    // const oauth2 = google.oauth2({
+                    //     auth: auth,
+                    //     version: 'v2',
+                    // });
 
-            res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
+                    // const userInfo = await oauth2.userinfo.get();
+                    // console.log('Authenticated User:', userInfo.data.id);
 
+                    res.status(200).json({ message: 'File uploaded successfully', fileId: response.data.id });
+                    break;
+                case action.DELETE:
+
+                    try {
+                        await driveService.files.delete({
+                            fileId: fileID
+                        });
+                        res.status(200).json({ message: 'File delete successfully' });
+                    }
+                    catch (error) {
+                        console.error(`Error deleting file: ${error.message}`);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         })
 
     } catch (error) {
