@@ -14,7 +14,10 @@ export default function navbar({ setLink, style }) {
         } else {
             element.classList.add('show');
         }
-    }
+    };
+    const navigateToActive = (category) => {
+        route.push(`/active?category=${category}`);
+      };
     return (
         <nav className={`navbar navbar-expand-md navbar-dark fixed-top ${style}`}>
             <div className="navbar-brand" >
@@ -35,9 +38,46 @@ export default function navbar({ setLink, style }) {
                     <li className="nav-item active">
                         <a className="nav-link" onClick={() => setLink('home')}>Home</a>
                     </li>
-                    <li className="nav-item">
-                        <a className="nav-link" onClick={() => setLink('active')}>Active</a>
-                    </li>
+                    <li className="nav-item dropdown">
+            <a
+              className="nav-link dropdown-toggle"
+              id="dropdownMenuButton"
+              role="button"
+              onClick={() => showElement('dropdownMenu')}
+            >
+              Active
+            </a>
+            <ul
+              className="dropdown-menu"
+              id="dropdownMenu"
+              style={{  position: 'absolute' }}
+            >
+              <li>
+                <a
+                  className="dropdown-item"
+                  onClick={() => navigateToActive('hien-mau')}
+                >
+                  Hiền Mẫu
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
+                  onClick={() => navigateToActive('gia-truong')}
+                >
+                  Gia Trưởng
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
+                  onClick={() => navigateToActive('gioi-tre')}
+                >
+                  Giới Trẻ
+                </a>
+              </li>
+            </ul>
+          </li>
                     <li className="nav-item">
                         <a className="nav-link" onClick={() => setLink('young')}>Yourng</a>
                     </li>

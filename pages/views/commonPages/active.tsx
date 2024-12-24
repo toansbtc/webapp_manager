@@ -1,161 +1,96 @@
-import { UserCredential, onAuthStateChanged, signOut } from 'firebase/auth';
-import Image from 'next/image'
-import { Router, useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { auth } from '../../api/config/fireBase';
-import { getItemSession } from '../Function/sessionFunction';
-import Profile from "../components/profile"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
+import Item from '../../../public/Screenshot 2024-12-04 122823.png';
 
-const page = 'home' || 'profile' || 'ballot'
-export default function active() {
-    const router = useRouter();
-    const [user, setuser] = useState('');
-    const [mainPage, setMainPage] = useState<typeof page>('home');
+export default function Active() {
+  const router = useRouter();
+  const { category } = router.query;
 
-    useEffect(() => {
-        // const unsubscriple = onAuthStateChanged(auth, (currentUser) => {
-        //     if (!currentUser && !sessionStorage.getItem(user)) {
-        //         router.replace('/')
-        //     }
-        // })
-        // return () => unsubscriple();
+  const [newsList, setNewsList] = useState([]);
 
-        const data = getItemSession()
-        if (data === 'undefined') {
-            router.replace('/')
+  useEffect(() => {
+    const allNews = {
+      'hien-mau': [
+        { id: 1, title: 'Hiền Mẫu News 1', image: Item, views: 610 },
+        { id: 2, title: 'Hiền Mẫu News 2', image: Item, views: 520 },
+      ],
+      'gia-truong': [
+        { id: 3, title: 'Gia Trưởng News 1', image: Item, views: 430 },
+        { id: 4, title: 'Gia Trưởng News 2', image: Item, views: 880 },
+      ],
+      'gioi-tre': [
+        { id: 5, title: 'Giới Trẻ News 1', image: Item, views: 340 },
+        { id: 6, title: 'Giới Trẻ News 2', image: Item, views: 120 },
+      ],
+    };
 
-        }
-        else
-            setuser(data)
+    if (category) {
+      const categoryKey = Array.isArray(category) ? category[0] : category;
+      if (allNews[categoryKey]) {
+        setNewsList(allNews[categoryKey]);
+      } else {
+        setNewsList([]);
+      }
+    }
+  }, [category]);
 
-    }, [router])
-
-    // console.log('use', get_user())
-
-    return (
-        // <div className="d-flex vh-100">
-        //     <div className="sidebar bg-info-subtle shadow" style={{ width: 250 }}>
-        //         <div className='w-100 bg-info p-3'>
-        //             <Image src="/bg.jpg"
-        //                 width={100}
-        //                 height={100}
-        //                 alt='avata'
-        //                 style={{ borderRadius: 50 }} />
-        //             {/* <div>{user}</div> */}
-        //         </div>
-        //         <ul className="nav flex-column">
-        //             <li className="nav-item">
-        //                 <a className="nav-link active" onClick={() => {
-        //                     setMainPage('home')
-        //                 }}>Home</a>
-        //             </li>
-        //             <li className="nav-item">
-        //                 <a className="nav-link" onClick={() => {
-        //                     setMainPage('profile')
-        //                 }}>Profile</a>
-        //             </li>
-        //             <li className="nav-item">
-        //                 <a className="nav-link" onClick={() => {
-        //                     setMainPage('ballot')
-        //                 }}>Ballot</a>
-        //             </li>
-        //             <li className="nav-item">
-        //                 <a className="nav-link" href="#">Settings</a>
-        //             </li>
-        //             <li className="nav-item">
-        //                 <a className="nav-link" onClick={() => {
-        //                     signOut(auth);
-        //                     sessionStorage.clear();
-        //                     router.replace('/')
-        //                 }}>Logout</a>
-        //             </li>
-        //         </ul>
-        //     </div>
-
-
-        //     <div className="content flex-grow-1 p-4">
-        //         {mainPage == 'profile' && (<div>
-        //             <Profile user={user} />
-        //         </div>)
-
-        //         }
-        //         {mainPage == 'ballot' && (<div>
-        //             <Ballot />
-        //         </div>)
-
-        //         }
-
-        //     </div>
-        // </div>
-
-        <div className="row">
-            {/* Left Side */}
-            <div className="  col-md-2 col-2 d-none d-md-block position-fixed mt-5" style={{ marginTop: '10%', top: '0', left: '0', height: '100vh', width: '16.6%', paddingLeft: 0 }}>
-                <div className="pt-3 bg-light border rounded h-100 ">
-
-                    <div style={{ height: '70%' }}>
-                        <h5
-                            className="text-center mb-4"
-                            style={{
-                                fontSize: '1.5rem',        // Larger font size
-                                fontWeight: 'bold',        // Make it bold
-                                color: '#ffffff',          // White text color
-                                backgroundColor: '#ff5733', // Bright orange background for contrast
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Add shadow for depth
-                                padding: 0
-                            }}
-                        >
-                            this is side image
-                        </h5>
-                        <div style={{ overflowY: 'auto', display: 'flex', whiteSpace: 'nowrap' }} >
-                            {/* {
-                      image.map((imageURL, index) =>
-                        <Image src={imageURL} unoptimized width={100} height={100} style={{ width: '100%', paddingBottom: 10 }} alt='image' onClick={() => {
-                          setOpenImage(true)
-                          setCurrentImageURL(imageURL)
-                          <div style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0 }}>
-                            <Image src={imageURL} width={100} height={100} alt='image' style={{ width: '100%', height: '100%' }} />
-                          </div>
-                        }} />
-                      )
-                    } */}
-                        </div>
-                        <div style={{ position: 'fixed', top: '73%', width: '15.2%' }}>
-                            <button style={{ width: '100%' }}>hello bottom</button>
-                        </div>
-                    </div>
-                    <div style={{ border: 4, borderColor: 'ActiveCaption', height: '30%' }}>
-                        this is calender
-                    </div>
-                </div>
+  return (
+    <div>
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        <h1 style={{ color: '#2E7D32' }}>
+          {typeof category === 'string' ? category.replace('-', ' ').toUpperCase() : ''}
+        </h1>
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '20px',
+          padding: '0 20px',
+        }}
+      >
+        {newsList.map((news) => (
+          <div
+            key={news.id}
+            style={{
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              overflow: 'hidden',
+            }}
+          >
+            <Image
+              src={news.image}
+              alt={news.title}
+              layout="responsive"
+              width={500}
+              height={300}
+            />
+            <div
+              style={{
+                padding: '10px',
+                backgroundColor: '#f9f9f9',
+                textAlign: 'center',
+              }}
+            >
+              <h3 style={{ fontSize: '16px', margin: '10px 0' }}>{news.title}</h3>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#555',
+                }}
+              >
+                <span style={{ marginRight: '5px' }}>
+                  <i className="fas fa-eye"></i>
+                </span>
+                <span>{news.views}</span>
+              </div>
             </div>
-
-            {/* Main Content Section */}
-            <div className="col-12 col-md-10 offset-md-2 mt-3">
-                <div className="pt-4 p-2 bg-white border rounded shadow-sm ">
-                    <Profile user={undefined} />
-                </div>
-            </div>
-
-            {/* Right Side */}
-            {/* <div className="col-md-2  col-2 d-none d-md-block position-fixed mt-5" style={{ top: '0', right: '0', height: '100vh', width: '16.6%', paddingRight: 0 }}>
-            <div className="pt-4 bg-light border rounded h-100">
-              {
-                video.map((videoURL, index) =>
-                  <iframe
-                    src={videoURL.replace('watch?v=', 'embed/')}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    onPlay={() => {
-
-                    }}
-                  />
-                )
-              }
-
-            </div>
-          </div> */}
-        </div>
-    )
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
