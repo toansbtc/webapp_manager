@@ -7,10 +7,20 @@ import actionDB from "../../api/DB/actionDB"
 import Quill_editor from '../components/quill_editor';
 import 'react-quill/dist/quill.snow.css';
 import { useLoading } from "../loadingPages/loadingContext"
+import { useDispatch, useSelector } from 'react-redux';
+import { appDispatch, rootState } from '../redux/store';
+import { fetchHomeData, handleHomeFatherIntro_Delete } from '../redux/homeDataSlice';
+import { deleteDriveImage, getDrivePath } from '../Function/getDrivePath';
+
 
 
 
 export default function home() {
+
+    const { setIsLoading } = useLoading();
+    const dispatch = useDispatch<appDispatch>();
+    const { dataDescription, dataFatherIntro, dataImagePath, loading, error } = useSelector((state: rootState) => state.homedata)
+
 
     const [modalAddFarther, setmodalAddFarther] = useState(false)
     const [description, setDescription] = useState<any>({})
@@ -18,14 +28,48 @@ export default function home() {
     const [fatherInfor, setFatherInfor] = useState({})
     const [editInfor, setEditInfor] = useState(false)
 
-    const { setIsLoading } = useLoading();
 
     useEffect(() => {
-        // const getIntroSQL = "delete FROM intro_home "
-        // axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
-        loadDataFatherInforList();
-        loadDataIntroduct();
-    }, [editInfor])
+        if (dataDescription) {
+            console.log("data redux change datadescription")
+            setDescription(dataDescription)
+        }
+    }, [dataDescription])
+
+
+    useEffect(() => {
+        if (dataFatherIntro) {
+            console.log("data redux change dataFatherIntro")
+            setInforList(dataFatherIntro)
+        }
+    }, [dataFatherIntro])
+
+
+    function formatTime(time: string) {
+        try {
+            if (time) {
+                const dateTime = time.split("T")[0]
+                return `${dateTime.split("-")[2]}/${dateTime.split("-")[1]}/${dateTime.split("-")[0]}`
+            }
+            else
+                return "Không xác định"
+        } catch (error) {
+            console.log("error when format time", error)
+        }
+    }
+
+
+
+    // const { setIsLoading } = useLoading();
+
+    // useEffect(() => {
+    // const getIntroSQL = "delete FROM intro_home "
+    // axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
+
+    //     loadDataFatherInforList();
+    //     loadDataIntroduct();
+
+    // }, [])
 
     const loadData = (data) => {
 
@@ -34,19 +78,20 @@ export default function home() {
 
     const loadDataIntroduct = async () => {
         try {
-            setIsLoading(true)
-            const getIntroSQL = "SELECT * FROM intro_home where introduct not like 'image%'  LIMIT 1"
-            await axios.post('/api/DB/CRUDintroHome', { "action": actionDB.NATIVESQL, "data": { "sql": getIntroSQL } })
+            // setIsLoading(true)
+            // const getIntroSQL = "SELECT * FROM intro_home where type = 'introduct'  LIMIT 1"
+            await axios.post('/api/DB/CRUDintroHome', { "action": actionDB.GETDATA, "data": { "type": "introduct" } })
                 .then((result) => {
                     if (result.status === 200)
-                        setDescription(result.data[0] ? result.data[0] : { "introduct": '' })
+                        console.log("introduct", result.data.introduct)
+                    setDescription(result.data ? result.data : { "introduct": '' })
                 })
 
         } catch (error) {
             console.log(error)
         }
         finally {
-            setIsLoading(false)
+            // setIsLoading(false)
         }
 
     }
@@ -74,11 +119,13 @@ export default function home() {
             })
     }
 
-    const controlModal = (option) => {
+    const openCloseAddFather = (option) => {
         setmodalAddFarther(option)
+        setFatherInfor({})
     }
     const openCloseQuill = (option) => {
         setEditInfor(option);
+        setFatherInfor({})
     }
 
 
@@ -91,7 +138,7 @@ export default function home() {
                 {
                     editInfor ?
                         (
-                            <Quill_editor data={description} openCloseQuill={openCloseQuill} loadData={loadData} />
+                            <Quill_editor data={description} openCloseQuill={openCloseQuill} loadData={loadData} type={"introduct"} />
                         )
                         :
                         (
@@ -104,13 +151,14 @@ export default function home() {
             {/* main content */}
             <div style={styles.gridContainer} >
                 {inforlist.map((item, index) =>
+
                 (
-                    <div key={index} className="container py-2">
+                    <div key={index}>
                         <div className="card mx-auto shadow" style={{ maxWidth: 450 }}>
 
                             <Image
                                 unoptimized
-                                src={item.image_path}
+                                src={getDrivePath(item.image_path.image_path)}
                                 alt={"image " + index}
                                 width={300}
                                 height={200}
@@ -118,11 +166,14 @@ export default function home() {
                                 className="card-img-top"
                             />
                             <div className="card-body text-start bg-primary-subtle">
-                                <h4 className='card-text'><strong>Tên: {item.name}</strong></h4>
+                                <h4 className='card-text text-center'><strong>{item.name}</strong></h4>
+                                <p></p>
                                 <h5 className='card-text'>Chức vụ: {item.office}</h5>
-                                <h5 className='card-text'>Thời gian bắt đầu: {item.time_start}</h5>
-                                <h5 className='card-text'>Giới thiệu chung :
-                                    <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word", width: "100%", height: 100, margin: 0 }}>{item.introduction}</pre>
+                                <h5 className='card-text'>Thời gian bắt đầu: {formatTime(item.time_start)}</h5>
+                                <h5 className='card-text'>Giới thiệu chung:
+                                    <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word", width: "100%", height: 100, margin: 0 }}>
+                                        {item.introduction}
+                                    </pre>
                                 </h5>
 
                                 <div className='row text-center'>
@@ -139,9 +190,18 @@ export default function home() {
                                         const isConfirmed = confirm("Are you sure you want to delete this item?");
 
                                         if (isConfirmed) {
+                                            setIsLoading(true)
                                             await axios.post('/api/DB/CRUDfatherInfor', { "action": actionDB.DELETE, "data": { "id": item.id } });
+                                            deleteDriveImage(item.image_path, actionDB.DELETE).then((result) => {
+                                                alert(result)
+                                            })
                                             alert("data deleted!")
-                                            loadDataFatherInforList()
+
+                                            await dispatch(
+                                                handleHomeFatherIntro_Delete(item)
+                                            );
+                                            setIsLoading(false)
+                                            // loadDataFatherInforList()
                                         } else {
                                             console.log("Delete canceled");
                                         }
@@ -152,16 +212,17 @@ export default function home() {
                             </div>
                         </div>
                     </div>
-                ))}
+                )
+                )}
                 <div>
                     <button className='btn btn-success text-center'
-                        onClick={() => setmodalAddFarther(true)}>
+                        onClick={() => { setmodalAddFarther(true); setFatherInfor({}) }}>
                         +
                     </button>
                 </div>
             </div>
 
-            {modalAddFarther && (<div style={{ position: 'fixed', justifyContent: 'center', alignContent: 'center' }}><AddFatherModal controlModal={controlModal} loadList={loadDataFatherInforList} fatherIntro={fatherInfor} /></div>)}
+            {modalAddFarther && (<div style={{ position: 'fixed', justifyContent: 'center', alignContent: 'center' }}><AddFatherModal controlModal={openCloseAddFather} loadList={() => { }} fatherIntro={fatherInfor} /></div>)}
         </div>
     )
 };
@@ -174,8 +235,8 @@ const styles = {
         margin: '0 auto',
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(272deg, #d5d5514f, #d998d440, #a7ff8396)",
-        color: "#333",
+        background: "linear-gradient(272deg, #eee5ee8c, #82fffa69, #dadbdb33)",
+        color: "#050202",
 
     },
     pageContainer: {
@@ -201,12 +262,14 @@ const styles = {
         height: '500px'
     },
     gridContainer: {
-        textAlign: 'center',
+        // textAlign: 'center',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '20px',
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: '20px',
+        background: "linear-gradient(152deg, #5f88fff5, #d509c67d, #df1c1ccc)",
     },
     gridItem: {
         textAlign: 'center',

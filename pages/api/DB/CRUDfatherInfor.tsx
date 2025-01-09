@@ -59,6 +59,14 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                             },
                         },
                     },
+                    include: {
+                        image_path: {
+                            select: {
+                                id_image_path: true,
+                                image_path: true
+                            }
+                        }
+                    },
                 })
                 break;
             case ActionDB.UPDATE:
@@ -79,6 +87,21 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                                 },
                             },
                         },
+                        include: {
+                            image_path: {
+                                select: {
+                                    id_image_path: true,
+                                    image_path: true
+                                }
+                            }
+                        },
+                        // select:{
+                        //     image_path:{
+                        //         select:{
+                        //             image_path:true
+                        //         }
+                        //     }
+                        // }
 
                     }
                 )

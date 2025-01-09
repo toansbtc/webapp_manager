@@ -10,25 +10,54 @@ import axios from 'axios';
 import Navbar from './views/components/navbar';
 import { setInterval } from 'timers';
 import action from './api/DB/actionDB';
+import { useLoading } from "./views/loadingPages/loadingContext"
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHomeData, handleHomeImagePath } from './views/redux/homeDataSlice';
+import { appDispatch, rootState } from './views/redux/store';
 
 const page = 'home' || 'active' || 'young'
 export default function index() {
 
 
-
   const [isScrolled, setIsScrolled] = useState(false);
   const [link, setLink] = useState<typeof page>('home')
+  const [imageIntroduct, setImageIntroduct] = useState({ "introduct": "", "id": null, "type": "" })
   const [imageList, setImageList] = useState([])
   const [indexImage, setIndexImage] = useState(0);
+  const [editImage, setEditImage] = useState(false);
+  const [onChangeImagePath, setOnChangeImagePath] = useState("");
 
 
 
+  const { setIsLoading } = useLoading();
+  const dispatch = useDispatch<appDispatch>();
+  const { dataDescription, dataFatherIntro, dataImagePath, loading, error } = useSelector((state: rootState) => state.homedata)
   let touchStartX = 0;
 
+
+
+
+
+  // set data for image path when change
+  useEffect(() => {
+
+    if (loading)
+      setIsLoading(true)
+    else {
+      setIsLoading(false)
+      setImageIntroduct(dataImagePath)
+      console.log('dataImagePath', dataDescription, dataFatherIntro, dataImagePath)
+    }
+
+  }, [dataImagePath])
+
+  // function to set link navbar
   const setLinkFromNavbar = (link: typeof page) => {
     setLink(link)
   }
 
+
+  // add scroll to window
   useEffect(() => {
     // const interval = setInterval(() => {
     //   if (indexImage < imageList.length - 1)
@@ -37,27 +66,92 @@ export default function index() {
     //     setIndexImage(0);
     // }, 3000)
 
-    axios.post("/api/DB/CRUDintroHome", { "action": action.GETDATA }).then((result) => {
-      result.data
-    })
+    // loadImageList();
 
     const handleScroll = () => {
       const triggerHeight = window.innerHeight / 1.3;
-
       setIsScrolled(window.scrollY > triggerHeight);
     };
-
     window.addEventListener('scroll', handleScroll);
-
     return () => {
       // clearInterval(interval)
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const addNewImageFile = () => {
-    const idIMG = "";
-    axios.post("/api/DB/CRUDintroHome", { "action": action.CREATE, "data": { "introduct": "image", "image_path": idIMG } })
+
+  // get image path form data
+  useEffect(() => {
+    if (imageIntroduct.introduct) {
+      const data = imageIntroduct.introduct.split('\n')
+      setOnChangeImagePath(imageIntroduct.introduct)
+      setImageList(data)
+      console.log("image list path", imageList)
+    }
+  }, [imageIntroduct])
+
+
+
+  // function loadImageList() {
+  //   try {
+
+  //     axios.post("/api/DB/CRUDintroHome", { "action": action.GETDATA, "data": { "type": "image" } }).then((result) => {
+  //       console.log("image introduct", result)
+  //       setImageIntroduct(result.data)
+  //     })
+
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  //   finally {
+
+  //   }
+  // }
+
+
+  // add or update image path 
+  async function handleImagePath(e) {
+    e.preventDefault();
+    setImageIntroduct({ id: imageIntroduct.id, introduct: onChangeImagePath, type: imageIntroduct.type })
+    try {
+      setEditImage(false)
+      setIsLoading(true)
+      if (imageIntroduct.id) {
+
+        await axios.post("/api/DB/CRUDintroHome", { "action": action.UPDATE, "data": { "introduct": onChangeImagePath, "id": imageIntroduct.id } }).then((result) => {
+
+          if (result.status === 200) {
+            dispatch(handleHomeImagePath({ "introduct": onChangeImagePath, "id": imageIntroduct.id } as any))
+            alert("update image path success!")
+
+          }
+        })
+      }
+      else {
+        await axios.post("/api/DB/CRUDintroHome", { "action": action.CREATE, "data": { "introduct": onChangeImagePath, "type": "image" } }).then((result) => {
+
+          if (result.status === 200) {
+            setIsLoading(true)
+            dispatch(
+              fetchHomeData({
+                loadingIntroHome: false,
+                loadingFatherInfor: false,
+                loadingImage: true,
+              })
+            );
+            setIsLoading(false)
+            alert("create image path success")
+          }
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+    finally {
+      setIsLoading(false)
+    }
+
   }
 
   return (
@@ -70,6 +164,7 @@ export default function index() {
       </Head>
 
       {link === "home" ? (
+
         <header className="position-relative">
           {/* Dynamic class applied for scroll effect */}
           <div
@@ -110,7 +205,7 @@ export default function index() {
               {"<"}
             </button>
 
-
+            <Image style={{ position: 'fixed', top: '10%', right: 0, background: 'white' }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditImage(true)} />
             <Image
               unoptimized
               src={imageList[indexImage]}
@@ -136,35 +231,63 @@ export default function index() {
 
           </div>
           <Navbar setLink={setLinkFromNavbar} style={!isScrolled ? "bg-transparent" : "bg-black"} />
-        </header>
-      ) : (
-        <Navbar setLink={setLinkFromNavbar} style={"bg-black"} />
-      )}
 
-      {/* Main Layout */}
-      <div className="container-fluid">
-        {link === 'active' && (
-          <Active />
-        )}
-        {link === 'home' && (
+
           <div className={`home-container ${isScrolled ? 'visible' : ''}`}>
             <Home />
           </div>
-        )}
-        {link === 'young' && (
+        </header>
+
+
+      ) : (
+        <div style={{ height: '100vh', width: '100%', display: 'grid' }}>
+          <div><Navbar setLink={setLinkFromNavbar} style={"bg-black"} /></div>
+          <div>
+            {link === 'active' && (
+              <div className=''>
+                <Active />
+              </div>
+            )}
+            {link === 'young' && (
+              <div>
+                <Yourng />
+              </div>
+            )}
+          </div>
+        </div>
+
+      )}
+
+
+
+
+
+      {/* Main Layout */}
+
+      {/* {link === 'active' && (
+        <div className=''>
+          <Active />
+        </div>
+      )}
+      {link === 'young' && (
+        <div>
           <Yourng />
-        )}
-      </div>
+        </div>
+      )} 
+       {link === 'home' && (
+          <div className={`home-container ${isScrolled ? 'visible' : ''}`}>
+            <Home />
+          </div>
+        )} */}
 
 
 
 
-
-      {/* open view image full screen */}
-      {/* {opneImage && (
+      {/* open edit image path */}
+      {editImage && (
         <div
           className="modal show"
-          style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)' }}
+          style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.6)' }}
         >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
@@ -172,24 +295,43 @@ export default function index() {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={() => setOpenImage(false)}
+                  onClick={() => setEditImage(false)}
                   aria-label="Close"
                 ></button>
               </div>
               <div className="modal-body">
-                <Image
-                  unoptimized
-                  src={currentImageURL}
-                  width={200}
-                  height={200}
-                  alt="Popup image"
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                />
+                <form onSubmit={handleImagePath}>
+
+
+                  <div className="mb-3">
+                    <label htmlFor="address" className="form-label">image path:</label>
+                    <textarea
+                      // maxLength={250}
+                      aria-valuemax={100}
+                      style={{ width: '100%', height: 170 }}
+                      aria-multiline
+                      id="introduction"
+                      name="introduction"
+                      value={onChangeImagePath}
+                      onChange={(e) => { setOnChangeImagePath(e.target.value) }}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+
+
+
+                  <button type="submit" className="btn btn-primary">{imageIntroduct.id ? "Cập nhật" : "Thêm mới"}</button>
+
+
+                </form>
               </div>
             </div>
           </div>
         </div>
-      )} */}
+      )}
     </>
   )
 }
+
+

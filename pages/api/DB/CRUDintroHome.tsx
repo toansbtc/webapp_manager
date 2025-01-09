@@ -20,21 +20,19 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                 result = await prisma.$queryRaw(Prisma.sql([sql]))
                 break;
             case ActionDB.GETDATA:
-                result = await prisma.intro_home.findMany({
-                    include: {
-                        image_path: true
-                    },
+                console.log("formData", formData)
+                result = await prisma.intro_home.findFirst({
                     where: {
-                        introduct: {
-                            startsWith: "image"
-                        },
+                        type: formData.type
                     }
                 })
                 break;
             case ActionDB.CREATE:
+                console.log(formData)
                 result = await prisma.intro_home.create({
                     data: {
                         introduct: formData.introduct,
+                        type: formData.type,
                         ...(formData.image_path && {
                             image_path: {
                                 create: {
@@ -59,13 +57,14 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                     },
                     where: {
                         id: formData.id
+
                     }
                 })
 
                 break;
             case ActionDB.DELETE:
                 result = await prisma.intro_home.delete({
-                    include: { image_path: true },
+                    // include: { image_path: true },
                     where: {
                         id: formData.id
                     }

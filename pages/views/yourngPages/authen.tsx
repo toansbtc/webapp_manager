@@ -8,7 +8,7 @@ import { auth, faceBookProvider, googleprovider, user } from "../../api/config/f
 import { useDispatch, useSelector } from "react-redux";
 
 import { browserLocalPersistence, setPersistence } from 'firebase/auth';
-import { getItemSession, key_user, setItemSession } from "../../api/Function/sessionFunction";
+import { getItemSession, key_user, setItemSession } from "../../views/Function/sessionFunction";
 import { current } from "@reduxjs/toolkit";
 
 const inter = Inter({ subsets: ["vietnamese"] });

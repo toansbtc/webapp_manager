@@ -1,8 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import fireBaseRedux from './reduxSlice'
+import homeDataSlice from "./homeDataSlice";
 
 const store = configureStore({
-    reducer: fireBaseRedux
+    reducer: {
+        fireBaseRedux,
+        homedata: homeDataSlice
+    }
 })
 
 export type rootState = ReturnType<typeof store.getState>;

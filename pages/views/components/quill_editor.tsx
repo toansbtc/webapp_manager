@@ -42,7 +42,7 @@ const quillFormats = [
 
 
 
-export default function quill_editor({ data, openCloseQuill, loadData }) {
+export default function quill_editor({ data, openCloseQuill, loadData, type }) {
   const [content, setContent] = useState(data.id ? data.introduct : '');
   const [updateData, setUpdateData] = useState({});
   const handleEditorChange = (content, delta, source, editor) => {
@@ -58,11 +58,12 @@ export default function quill_editor({ data, openCloseQuill, loadData }) {
       }
     }
     else {
-      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content } });
+      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content, "type": type } });
       if (result.status === 200) {
         alert("change success")
       }
     }
+
   }
 
 

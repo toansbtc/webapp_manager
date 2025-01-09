@@ -2,15 +2,22 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import action from '@/pages/api/DB/actionDB';
 import axios from 'axios';
-import { getDrivePath } from '../Function/getDrivePath';
+import { createDriveImage, getDrivePath } from '../Function/getDrivePath';
+import { useLoading } from '../loadingPages/loadingContext';
+import { useDispatch } from 'react-redux';
+import { appDispatch } from '../redux/store';
+import homeDataSlice, { fetchHomeData, handleHomeFatherIntro_Add, handleHomeFatherIntro_Update } from '../redux/homeDataSlice';
 
 export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
 
+  const { setIsLoading } = useLoading();
+  const dispath = useDispatch<appDispatch>();
 
   useEffect(() => {
-    if (fatherIntro) {
+    if (fatherIntro.time_start) {
+      fatherIntro = { ...fatherIntro, time_start: fatherIntro.time_start.toString().split("T")[0] }
       setFormData(fatherIntro)
     }
     // axios.post("/api/DB/CRUDfatherInfor", { "action": action.NATIVESQL, "data": { "sql": "select * from image_path" } }).then((data) => {
@@ -57,22 +64,16 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
       'time_start': formData.time_start,
       'office': formData.office,
       'introduction': formData.introduction,
-      "image_path": ""
+      "image_path": formData.image
     }
 
     try {
+      setIsLoading(true)
 
       if (imageFile) {
 
-        const formDataImage = new FormData();
-        formDataImage.append("fileImage", imageFile);
-        formDataImage.append("folderName", "Father");
-        formDataImage.append("action", action.CREATE);
-        await axios.post("/api/controller/gg_drive", formDataImage).then((result) => {
-          if (result.data) {
-            console.log("data result ", result.data);
-            data.image_path = result.data.fileId;
-          }
+        createDriveImage(imageFile, "Father", action.CREATE).then((fileID) => {
+          data.image_path = fileID
         })
       }
 
@@ -83,31 +84,47 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
       if (fatherIntro.id) {
 
-        fatherIntro.name = formData.name
-        fatherIntro.time_start = formData.time_start
-        fatherIntro.office = formData.office
-        fatherIntro.introduction = formData.introduction
-        fatherIntro.image_path = data.image_path === "" ? formData.image : data.image_path
+        const updatedFatherIntro = {
+          ...fatherIntro, // Spread the existing properties
+          name: formData.name, // Update the name property
+          time_start: formData.time_start, // Update the time_start property
+          office: formData.office, // Update the office property
+          introduction: formData.introduction, // Update the introduction property
+          image_path: data.image_path
+        };
 
-        const updateFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": fatherIntro })
-        if (updateFatherIntro.status === 200) {
-          alert('Chỉnh sửa thành công!');
-        } else {
-          alert('Error submitting the form.');
-        }
+        console.log("updatedFatherIntro")
+
+        await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": updatedFatherIntro }).then((result) => {
+          if (result.status === 200) {
+            console.log("result.data", result.data)
+            dispath(handleHomeFatherIntro_Update(updatedFatherIntro))
+            alert('Chỉnh sửa thành công!');
+            controlModal(false)
+          } else {
+            alert('faile to update');
+          }
+        }).catch((e) => console.log("-----error when update father infor-----\n", e))
       }
       else {
-        const createFatherIntro = await axios.post("/api/DB/CRUDfatherInfor", { "action": action.CREATE, "data": data })
-        if (createFatherIntro.status === 200) {
-          alert('Thêm mới thành công!');
-          setFormData({ name: '', time_start: '', office: '', introduction: '', image: null });
-        } else {
-          alert('Error submitting the form.');
-        }
+        await axios.post("/api/DB/CRUDfatherInfor", { "action": action.CREATE, "data": data }).then((result) => {
+          if (result.status === 200) {
+
+            dispath(handleHomeFatherIntro_Add(data as any))
+            alert('Chỉnh sửa thành công!');
+            controlModal(false)
+          } else {
+            alert('faile to create');
+          }
+        }).catch((e) => console.log("-----error when create father infor-----\n", e))
       }
+
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while submitting the form.');
+    }
+    finally {
+      setIsLoading(false)
     }
   };
 
@@ -126,7 +143,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
               <button
                 type="button"
                 className="btn-close"
-                onClick={() => { controlModal(false), loadList(); }}
+                onClick={() => { controlModal(false) }}
                 aria-label="Close"
               ></button>
             </div>

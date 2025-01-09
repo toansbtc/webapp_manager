@@ -30,11 +30,9 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
 
             if (err)
                 console.log(err)
-            const file = Array.isArray(files.fileImage) ? files.fileImage[0] : files.fileImage
-            console.log(fields)
-            const folderName = Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
+
             const actionData = Array.isArray(fields.action) ? fields.action[0] : fields.action
-            const fileID = Array.isArray(fields.fileID) ? fields.fileID[0] : fields.fileID
+
 
 
             const auth = new google.auth.GoogleAuth({
@@ -44,10 +42,13 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
 
 
             const driveService = google.drive({ version: 'v3', auth })
-            const fileStream = fs.createReadStream(file.filepath);
 
             switch (actionData) {
                 case action.CREATE:
+
+                    const file = Array.isArray(files.fileImage) ? files.fileImage[0] : files.fileImage
+                    const folderName = Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
+                    const fileStream = fs.createReadStream(file.filepath);
 
                     const response = await driveService.files.create({
                         requestBody: {
@@ -74,6 +75,7 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                 case action.DELETE:
 
                     try {
+                        const fileID = Array.isArray(fields.fileID) ? fields.fileID[0] : fields.fileID
                         await driveService.files.delete({
                             fileId: fileID
                         });

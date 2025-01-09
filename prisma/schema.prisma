@@ -24,7 +24,7 @@ model image_path {
   id_image_path Int             @id @unique @default(autoincrement())
   farther_intro farther_intro[]
   infor         infor[]
-  intro_home    intro_home[]
+  // intro_home    intro_home[]
 
   // @@schema("catho_schema")
 }
@@ -62,10 +62,12 @@ model farther_intro {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model intro_home {
-  id            Int         @id @default(autoincrement())
-  id_image_path Int?
-  introduct     String?
-  image_path    image_path? @relation(fields: [id_image_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
+  id        Int     @id @default(autoincrement())
+  introduct String?
+  type      String? //image or introduct
+
+  // id_image_path Int?
+  // image_path    image_path? @relation(fields: [id_image_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
 
   // @@schema("catho_schema")
 }

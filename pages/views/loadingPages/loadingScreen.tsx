@@ -19,7 +19,7 @@ export default function LoadingScreen() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    zIndex: 1000,
+                    zIndex: 2000,
                     color: "#fff",
                     fontSize: "24px",
                 }}

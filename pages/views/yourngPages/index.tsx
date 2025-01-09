@@ -1,12 +1,38 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import Quill_editor from '../components/quill_editor';
+import Image from 'next/image';
+import axios from 'axios';
+import action from '@/pages/api/DB/actionDB';
+
 
 export default function index() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [editInfor, setEditInfor] = useState(false);
+    const [description, setDescription] = useState<any>({});
+
+    useEffect(() => {
+        axios.post("../../api/DB/CRUDintroHome", { "action": action.GETDATA, "data": { "type": "young" } })
+            .then((result => {
+                if (result.status === 200)
+                    console.log("young introduct", result.data)
+                setDescription(result.data ? result.data : { "introduct": '' })
+            }))
+    }, [])
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+    const openCloseQuill = (option) => {
+        setEditInfor(option);
+    };
+    const loadData = (data) => {
+        setDescription(data);
+    };
+
+
+
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
+        <div className='container vh-100'>
             {/* Sidebar */}
             <div
                 style={{
@@ -20,7 +46,6 @@ export default function index() {
                     &times;
                 </button>
                 <div style={styles.sidebarContent}>
-                    <h2>Menu</h2>
                     <ul style={styles.menuList}>
                         <li>Dashboard</li>
                         <li>Profile</li>
@@ -39,10 +64,17 @@ export default function index() {
 
             {/* Main Content */}
             <div style={styles.mainContent}>
-                <h1>Main Content Area</h1>
-                <p>
-                    This is the main content area where you can put any page-specific content.
-                </p>
+                <Image style={{ position: 'fixed', top: '12%', right: 0 }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditInfor(true)} />
+                {
+                    editInfor ?
+                        (
+                            <Quill_editor data={description} openCloseQuill={openCloseQuill} loadData={loadData} type={"young"} />
+                        )
+                        :
+                        (
+                            <div id='innerHTML' dangerouslySetInnerHTML={{ __html: description ? description.introduct : '' }}></div>
+                        )
+                }
             </div>
         </div>
     );
@@ -51,10 +83,9 @@ export default function index() {
 // CSS Styles for components
 const styles = {
     sidebar: {
-
         left: 0,
-        top: 0,
-        width: '250px',
+        top: '10%',
+        width: '200px',
         height: '100%',
         backgroundColor: '#333',
         color: 'white',
@@ -73,7 +104,7 @@ const styles = {
     },
     openButton: {
 
-        left: '20px',
+        left: '10px',
         top: '100px',
         fontSize: '24px',
         backgroundColor: '#007bff',
