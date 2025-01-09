@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export function getDrivePath(id: string) {
+export default function getDrivePath(id: string) {
     return `https://drive.google.com/file/d/${id}`
 }
 

@@ -4,7 +4,7 @@ import { Router, useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { auth } from '../../api/config/fireBase';
-import { getItemSession } from '../Function/sessionFunction';
+import getItemSession from '../Function/sessionFunction';
 import Profile from "../components/profile"
 
 const page = 'home' || 'profile' || 'ballot'

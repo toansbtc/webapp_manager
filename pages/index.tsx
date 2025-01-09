@@ -12,8 +12,8 @@ import { setInterval } from 'timers';
 import action from './api/DB/actionDB';
 import { useLoading } from "./views/loadingPages/loadingContext"
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHomeData, handleHomeImagePath } from './views/redux/homeDataSlice';
-import { appDispatch, rootState } from './views/redux/store';
+import { fetchHomeData, handleHomeImagePath } from './api/redux/homeDataSlice';
+import { appDispatch, rootState } from './api/redux/store';
 
 const page = 'home' || 'active' || 'young'
 export default function index() {

@@ -1,6 +1,7 @@
 import { UserCredential } from "firebase/auth";
 
-export interface data_return {
+export default interface data_return {
     code: Number | String;
     user: UserCredential
 }
+export default function main() { }

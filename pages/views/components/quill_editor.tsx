@@ -43,7 +43,7 @@ const quillFormats = [
 
 
 export default function quill_editor({ data, openCloseQuill, loadData, type }) {
-  const [content, setContent] = useState(data.id ? data.introduct : '');
+  const [content, setContent] = useState(data?.id ? data.introduct : '');
   const [updateData, setUpdateData] = useState({});
   const handleEditorChange = (content, delta, source, editor) => {
     setContent(content);
@@ -51,18 +51,19 @@ export default function quill_editor({ data, openCloseQuill, loadData, type }) {
 
 
   const saveInfor = async () => {
-    if (data.id) {
-      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.UPDATE, "data": { "introduct": content, "id": data.id } });
-      if (result.status === 200) {
-        alert("update success")
+    if (data !== null)
+      if (data?.id) {
+        const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.UPDATE, "data": { "introduct": content, "id": data?.id } });
+        if (result.status === 200) {
+          alert("update success")
+        }
       }
-    }
-    else {
-      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content, "type": type } });
-      if (result.status === 200) {
-        alert("change success")
+      else {
+        const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content, "type": type } });
+        if (result.status === 200) {
+          alert("change success")
+        }
       }
-    }
 
   }
 
@@ -81,8 +82,8 @@ export default function quill_editor({ data, openCloseQuill, loadData, type }) {
       />
       <div className='justify-content-around align-content-around mt-1'>
         <button style={{ padding: 10 }} type='button' className='btn btn-info'
-          onClick={() => { saveInfor(), openCloseQuill(false), loadData({ "introduct": content, "id": data.id }) }}
-        >{data.id ? "update" : "save"}</button>
+          onClick={() => { saveInfor(), openCloseQuill(false), loadData({ "introduct": content, "id": data?.id }) }}
+        >{data?.id ? "update" : "save"}</button>
         <button style={{ padding: 10, marginLeft: 20 }} type='button' className='btn btn-danger'
           onClick={() => { openCloseQuill(false) }}
         >cancel</button>

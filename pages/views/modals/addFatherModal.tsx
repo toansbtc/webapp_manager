@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import action from '@/pages/api/DB/actionDB';
 import axios from 'axios';
-import { createDriveImage, getDrivePath } from '../Function/getDrivePath';
+import getDrivePath, { createDriveImage } from '../Function/getDrivePath';
 import { useLoading } from '../loadingPages/loadingContext';
 import { useDispatch } from 'react-redux';
-import { appDispatch } from '../redux/store';
-import homeDataSlice, { fetchHomeData, handleHomeFatherIntro_Add, handleHomeFatherIntro_Update } from '../redux/homeDataSlice';
+import { appDispatch } from '../../api/redux/store';
+import homeDataSlice, { fetchHomeData, handleHomeFatherIntro_Add, handleHomeFatherIntro_Update } from '../../api/redux/homeDataSlice';
 
 export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
   const [imagePreview, setImagePreview] = useState(null);
@@ -82,7 +82,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
 
 
-      if (fatherIntro.id) {
+      if (fatherIntro?.id) {
 
         const updatedFatherIntro = {
           ...fatherIntro, // Spread the existing properties
@@ -90,7 +90,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
           time_start: formData.time_start, // Update the time_start property
           office: formData.office, // Update the office property
           introduction: formData.introduction, // Update the introduction property
-          image_path: data.image_path
+          image_path: data?.image_path
         };
 
         console.log("updatedFatherIntro")
@@ -160,11 +160,11 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
                       </div>
                     </div>
                   )}
-                  {fatherIntro.image_path && !imagePreview && (
+                  {fatherIntro?.image_path && !imagePreview && (
                     <div className="mb-3">
                       <label className="form-label">Image Preview:</label>
                       <div>
-                        <img width={200} height={200} src={getDrivePath(fatherIntro.image_path)} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
+                        <img width={200} height={200} src={getDrivePath(fatherIntro?.image_path)} alt="Preview" className="img-thumbnail" style={{ maxWidth: '200px', height: 'auto' }} />
                       </div>
                     </div>
                   )}
@@ -176,7 +176,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
                     accept="image/*"
                     onChange={handleImageChange}
                     className="form-control"
-                    {...fatherIntro.id ? null : require}
+                    {...fatherIntro?.id ? null : require}
                   />
                 </div>
 
@@ -239,7 +239,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
 
 
-                <button type="submit" className="btn btn-primary">{fatherIntro.id ? "Cập nhật" : "Thêm mới"}</button>
+                <button type="submit" className="btn btn-primary">{fatherIntro?.id ? "Cập nhật" : "Thêm mới"}</button>
               </form>
             </div>
           </div>

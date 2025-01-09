@@ -8,9 +8,9 @@ import Quill_editor from '../components/quill_editor';
 import 'react-quill/dist/quill.snow.css';
 import { useLoading } from "../loadingPages/loadingContext"
 import { useDispatch, useSelector } from 'react-redux';
-import { appDispatch, rootState } from '../redux/store';
-import { fetchHomeData, handleHomeFatherIntro_Delete } from '../redux/homeDataSlice';
-import { deleteDriveImage, getDrivePath } from '../Function/getDrivePath';
+import { appDispatch, rootState } from '../../api/redux/store';
+import { fetchHomeData, handleHomeFatherIntro_Delete } from '../../api/redux/homeDataSlice';
+import getDrivePath, { deleteDriveImage } from '../Function/getDrivePath';
 
 
 
@@ -23,7 +23,7 @@ export default function home() {
 
 
     const [modalAddFarther, setmodalAddFarther] = useState(false)
-    const [description, setDescription] = useState<any>({})
+    const [description, setDescription] = useState<any>(null)
     const [inforlist, setInforList] = useState([])
     const [fatherInfor, setFatherInfor] = useState({})
     const [editInfor, setEditInfor] = useState(false)

@@ -13,7 +13,7 @@ const LoadingContext = createContext<LoadingContextValue>({
 });
 
 // Create the provider to wrap your application
-export const LoadingProvider = ({ children }: { children: React.ReactNode }) => {
+const LoadingProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -31,3 +31,5 @@ export const useLoading = () => {
   }
   return context;
 };
+
+export default LoadingProvider;

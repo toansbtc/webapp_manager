@@ -10,13 +10,18 @@ export function setItemSession(key: string, value, expired: number = 1800) {
         expired: expiredTime,
         value: value
     }
-    sessionStorage.setItem(key, JSON.stringify(item));
+    if (typeof window !== 'undefined') {
+        sessionStorage.setItem(key, JSON.stringify(item));
+    }
 
 }
 
-export function getItemSession() {
+export default function getItemSession() {
+    let session = null;
+    if (typeof window !== 'undefined') {
 
-    const session = sessionStorage.getItem(user);
+        session = sessionStorage.getItem(user);
+    }
     // console.log(session)
     let timeExpired = 0;
     if (session != null) {
