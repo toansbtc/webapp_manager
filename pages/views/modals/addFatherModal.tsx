@@ -7,6 +7,7 @@ import { useLoading } from '../loadingPages/loadingContext';
 import { useDispatch } from 'react-redux';
 import { appDispatch } from '../../api/redux/store';
 import homeDataSlice, { fetchHomeData, handleHomeFatherIntro_Add, handleHomeFatherIntro_Update } from '../../api/redux/homeDataSlice';
+import { log } from 'console';
 
 export default function addFatherModal({ controlModal, loadList, fatherIntro }) {
   const [imagePreview, setImagePreview] = useState(null);
@@ -59,7 +60,7 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
+    let data = {
       'name': formData.name,
       'time_start': formData.time_start,
       'office': formData.office,
@@ -72,9 +73,11 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
       if (imageFile) {
 
-        createDriveImage(imageFile, "Father", action.CREATE).then((fileID) => {
-          data.image_path = fileID
+        await createDriveImage(imageFile, "Father").then((fileID) => {
+          console.log("fileID", fileID)
+          data = { ...data, image_path: fileID }
         })
+        console.log("data update", data)
       }
 
 
@@ -84,21 +87,20 @@ export default function addFatherModal({ controlModal, loadList, fatherIntro }) 
 
       if (fatherIntro?.id) {
 
-        const updatedFatherIntro = {
+        fatherIntro = {
           ...fatherIntro, // Spread the existing properties
           name: formData.name, // Update the name property
           time_start: formData.time_start, // Update the time_start property
           office: formData.office, // Update the office property
           introduction: formData.introduction, // Update the introduction property
-          image_path: data?.image_path
+          image_path: data.image_path
         };
 
-        console.log("updatedFatherIntro")
 
-        await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": updatedFatherIntro }).then((result) => {
+        await axios.post("/api/DB/CRUDfatherInfor", { "action": action.UPDATE, "data": fatherIntro }).then((result) => {
           if (result.status === 200) {
             console.log("result.data", result.data)
-            dispath(handleHomeFatherIntro_Update(updatedFatherIntro))
+            dispath(handleHomeFatherIntro_Update(fatherIntro))
             alert('Chỉnh sửa thành công!');
             controlModal(false)
           } else {

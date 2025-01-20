@@ -7,6 +7,9 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
   // schemas  = ["catho_schema"]
+
+  // url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -14,6 +17,9 @@ model account_role {
   role       Int
   is_active  Boolean
   user_token String  @id @db.VarChar(255)
+  password   String?
+  id_infor   Int?
+  infor_key  infor?  @relation(fields: [id_infor], references: [id], onDelete: Cascade, map: "fk_infor")
 
   // @@schema("catho_schema")
 }
@@ -31,18 +37,18 @@ model image_path {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model infor {
-  birth_day         DateTime?   @db.Date
-  name              String[]    @db.Char
-  number_phone      String[]    @db.Char
-  address           String[]    @db.Char
-  situation         String[]    @db.Char
-  job               String[]    @db.Char
-  position          String[]    @db.Char
-  self_introduc     String[]    @db.Char
+  birth_day         DateTime?      @db.Date
+  name              String         @db.Char
+  number_phone      String         @db.Char
+  address           String         @db.Char
+  situation         String         @db.Char
+  job               String         @db.Char
+  position          String         @db.Char
+  self_introduc     String         @db.Char
   id_avata_img_path Int?
-  user_token        String      @db.VarChar(255)
-  id                Int         @id @unique @default(autoincrement())
-  image_path        image_path? @relation(fields: [id_avata_img_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
+  id                Int            @id @unique @default(autoincrement())
+  image_path        image_path?    @relation(fields: [id_avata_img_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
+  account_role      account_role[]
 
   // @@schema("catho_schema")
 }
@@ -70,4 +76,9 @@ model intro_home {
   // image_path    image_path? @relation(fields: [id_image_path], references: [id_image_path], onDelete: Cascade, map: "fk_image_path")
 
   // @@schema("catho_schema")
+}
+
+model capcha_code {
+  id          Int     @id @default(autoincrement())
+  capcha_code String?
 }

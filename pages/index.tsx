@@ -14,6 +14,9 @@ import { useLoading } from "./views/loadingPages/loadingContext"
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchHomeData, handleHomeImagePath } from './api/redux/homeDataSlice';
 import { appDispatch, rootState } from './api/redux/store';
+import actionDB from './api/DB/actionDB';
+import getItemSession from './views/Function/sessionFunction';
+
 
 const page = 'home' || 'active' || 'young'
 export default function index() {
@@ -26,6 +29,7 @@ export default function index() {
   const [indexImage, setIndexImage] = useState(0);
   const [editImage, setEditImage] = useState(false);
   const [onChangeImagePath, setOnChangeImagePath] = useState("");
+  const [user, setUser] = useState({ "role": 1000, "username": "anonimous" });
 
 
 
@@ -59,6 +63,18 @@ export default function index() {
 
   // add scroll to window
   useEffect(() => {
+    // const resuilt = axios.post("/api/DB/CRUDaccountRole", { "action": actionDB.CREATE, "data": { "user_token": "Admin", "role": 0, "is_active": true } })
+    // axios.post("/api/DB/CRUDaccountRole", { "action": actionDB.UPDATE, "data": { "user_token": "Admin", "password": "AAaa**22" } }).then((resuilt) => {
+    //   console.log("resuilt", resuilt)
+    // })
+
+    if (getItemSession() !== 'undefined') {
+      const user = JSON.parse(getItemSession());
+      console.log("user is: ", user)
+      setUser(user)
+    }
+
+
     // const interval = setInterval(() => {
     //   if (indexImage < imageList.length - 1)
     //     setIndexImage(indexImage + 1)
@@ -189,7 +205,7 @@ export default function index() {
             }}
             className={` bg-image ${isScrolled ? 'scrolled' : ''}`}>
 
-            <button className='icon-right' onClick={() => {
+            <button className='icon-right text-center' onClick={() => {
               if (indexImage < imageList.length - 1)
                 setIndexImage(indexImage + 1)
               else if (indexImage == imageList.length - 1)
@@ -198,14 +214,17 @@ export default function index() {
             }}>
               {">"}
             </button>
-            <button className='icon-left' onClick={() => {
+            <button className='icon-left text-center' onClick={() => {
               if (0 < indexImage && indexImage <= imageList.length - 1)
                 setIndexImage(indexImage - 1)
             }}>
               {"<"}
             </button>
 
-            <Image style={{ position: 'fixed', top: '10%', right: 0, background: 'white' }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditImage(true)} />
+
+            {user.role == 0 && (<Image style={{ position: 'fixed', top: '10%', right: 0, background: 'white' }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditImage(true)} />)}
+
+
             <Image
               unoptimized
               src={imageList[indexImage]}
@@ -330,6 +349,7 @@ export default function index() {
           </div>
         </div>
       )}
+      {/* {openLogin && (<Loggin_registerModal controlModal={controlModal} />)} */}
     </>
   )
 }

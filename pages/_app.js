@@ -7,6 +7,7 @@ import store from './api/redux/store'
 import LoadingProvider from "./views/loadingPages/loadingContext"
 import LoadingScreen from "./views/loadingPages/loadingScreen"
 import FetchDataPage from "./api/redux/fetchDataPage"
+import Loggin_registerModal from "./views/modals/loggin_registerModal"
 
 
 export default function App({ Component, pageProps }) {

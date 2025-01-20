@@ -51,19 +51,18 @@ export default function quill_editor({ data, openCloseQuill, loadData, type }) {
 
 
   const saveInfor = async () => {
-    if (data !== null)
-      if (data?.id) {
-        const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.UPDATE, "data": { "introduct": content, "id": data?.id } });
-        if (result.status === 200) {
-          alert("update success")
-        }
+    if (data?.id) {
+      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.UPDATE, "data": { "introduct": content, "id": data?.id } });
+      if (result.status === 200) {
+        alert("update success")
       }
-      else {
-        const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content, "type": type } });
-        if (result.status === 200) {
-          alert("change success")
-        }
+    }
+    else {
+      const result = await axios.post("/api/DB/CRUDintroHome", { "action": actionDB.CREATE, "data": { "introduct": content, "type": type } });
+      if (result.status === 200) {
+        alert("change success")
       }
+    }
 
   }
 

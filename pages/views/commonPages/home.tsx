@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { appDispatch, rootState } from '../../api/redux/store';
 import { fetchHomeData, handleHomeFatherIntro_Delete } from '../../api/redux/homeDataSlice';
 import getDrivePath, { deleteDriveImage } from '../Function/getDrivePath';
+import getItemSession from '../Function/sessionFunction';
 
 
 
@@ -27,6 +28,15 @@ export default function home() {
     const [inforlist, setInforList] = useState([])
     const [fatherInfor, setFatherInfor] = useState({})
     const [editInfor, setEditInfor] = useState(false)
+    const [user, setUser] = useState({ "role": 1000, "username": "anonimous" });
+
+    useEffect(() => {
+        if (getItemSession() !== 'undefined') {
+            const user = JSON.parse(getItemSession());
+            console.log("user is: ", user)
+            setUser(user)
+        }
+    }, [])
 
 
     useEffect(() => {
@@ -134,7 +144,7 @@ export default function home() {
         <div style={styles.pageContainer}>
             <div style={styles.mainContainer}>
 
-                <Image style={{ position: 'fixed', top: 0, right: 0 }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditInfor(true)} />
+                {user.role == 0 && (<Image style={{ position: 'fixed', top: 0, right: 0 }} src={"/pen_icon_edit.png"} alt='icon pen' width={30} height={30} onClick={() => setEditInfor(true)} />)}
                 {
                     editInfor ?
                         (
@@ -176,50 +186,54 @@ export default function home() {
                                     </pre>
                                 </h5>
 
-                                <div className='row text-center'>
-                                    {/* update data infor  */}
-                                    <div style={{ width: '100%', backgroundColor: 'rgb(33 179 110)' }} onClick={() => {
-                                        setFatherInfor(item)
-                                        setmodalAddFarther(true)
-                                    }}>
-                                        <span>Update</span>
+                                {user.role == 0 && (
+                                    <div className='row text-center'>
+                                        {/* update data infor  */}
+                                        <div style={{ width: '100%', backgroundColor: 'rgb(33 179 110)' }} onClick={() => {
+                                            setFatherInfor(item)
+                                            setmodalAddFarther(true)
+                                        }}>
+                                            <span>Update</span>
+                                        </div>
+
+                                        {/* delete father infor */}
+                                        <div style={{ width: '100%', backgroundColor: '#b33421', marginTop: 5 }} onClick={async () => {
+                                            const isConfirmed = confirm("Are you sure you want to delete this item?");
+
+                                            if (isConfirmed) {
+                                                setIsLoading(true)
+                                                await axios.post('/api/DB/CRUDfatherInfor', { "action": actionDB.DELETE, "data": { "id": item.id } });
+                                                deleteDriveImage(item.image_path).then((result) => {
+                                                    alert(result)
+                                                })
+                                                alert("data deleted!")
+
+                                                await dispatch(
+                                                    handleHomeFatherIntro_Delete(item)
+                                                );
+                                                setIsLoading(false)
+                                                // loadDataFatherInforList()
+                                            } else {
+                                                console.log("Delete canceled");
+                                            }
+                                        }}>
+                                            <span>Delete</span>
+                                        </div>
                                     </div>
-
-                                    {/* delete father infor */}
-                                    <div style={{ width: '100%', backgroundColor: '#b33421', marginTop: 5 }} onClick={async () => {
-                                        const isConfirmed = confirm("Are you sure you want to delete this item?");
-
-                                        if (isConfirmed) {
-                                            setIsLoading(true)
-                                            await axios.post('/api/DB/CRUDfatherInfor', { "action": actionDB.DELETE, "data": { "id": item.id } });
-                                            deleteDriveImage(item.image_path, actionDB.DELETE).then((result) => {
-                                                alert(result)
-                                            })
-                                            alert("data deleted!")
-
-                                            await dispatch(
-                                                handleHomeFatherIntro_Delete(item)
-                                            );
-                                            setIsLoading(false)
-                                            // loadDataFatherInforList()
-                                        } else {
-                                            console.log("Delete canceled");
-                                        }
-                                    }}>
-                                        <span>Delete</span>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 )
                 )}
-                <div>
-                    <button className='btn btn-success text-center'
-                        onClick={() => { setmodalAddFarther(true); setFatherInfor({}) }}>
-                        +
-                    </button>
-                </div>
+                {user.role == 0 && (
+                    <div className='text-center'>
+                        <button className='btn btn-success text-center'
+                            onClick={() => { setmodalAddFarther(true); setFatherInfor({}) }}>
+                            +
+                        </button>
+                    </div>
+                )}
             </div>
 
             {modalAddFarther && (<div style={{ position: 'fixed', justifyContent: 'center', alignContent: 'center' }}><AddFatherModal controlModal={openCloseAddFather} loadList={() => { }} fatherIntro={fatherInfor} /></div>)}
@@ -263,6 +277,7 @@ const styles = {
     },
     gridContainer: {
         // textAlign: 'center',
+
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '20px',

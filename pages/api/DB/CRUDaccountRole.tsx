@@ -39,7 +39,8 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                 result = await prisma.account_role.update({
                     data: {
                         role: formData.role,
-                        is_active: formData.is_active
+                        is_active: formData.is_active,
+                        password: formData.password
                     },
                     where: {
                         user_token: formData.user_token

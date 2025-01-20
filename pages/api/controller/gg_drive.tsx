@@ -50,6 +50,7 @@ export default async function gg_drive(req: NextApiRequest, res: NextApiResponse
                     const folderName = Array.isArray(fields.folderName) ? fields.folderName[0] : fields.folderName
                     const fileStream = fs.createReadStream(file.filepath);
 
+                    console.log("come to create file in gg drive")
                     const response = await driveService.files.create({
                         requestBody: {
                             name: file.originalFilename,

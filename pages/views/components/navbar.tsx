@@ -1,11 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import router, { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../api//config/fireBase';
 import Image from 'next/image'
+import { useDispatch } from 'react-redux';
+import { openClose_Login } from '@/pages/api/redux/openClose_logginSlice';
+import getItemSession from '../Function/sessionFunction';
+
+
 
 export default function navbar({ setLink, style }) {
-    const [user, setUser] = useState('Anonymous')
+
+    const dispath = useDispatch();
+
+
+    const [user, setUser] = useState(null);
+
+
+    useEffect(() => {
+        if (getItemSession() !== 'undefined') {
+            const user = JSON.parse(getItemSession());
+            console.log("user is: ", user)
+            setUser(user)
+        }
+    }, [])
+
     const route = useRouter();
     const showElement = (id) => {
         const element = document.getElementById(id)
@@ -19,7 +38,7 @@ export default function navbar({ setLink, style }) {
         <nav className={`navbar navbar-expand-md navbar-dark fixed-top ${style}`}>
             <div className="navbar-brand" >
                 <button className='mr-1 btn '
-                    onClick={() => route.push('/authen')}
+                    onClick={() => route.push('/')}
                 >
                     <Image src={'/church.jpeg'} priority width={55} height={50} alt='Home icon' className='rounded-circle m-lg-0' />
                     <span className='text-white' style={{ marginRight: 10 }}>Logo home</span>
@@ -46,7 +65,7 @@ export default function navbar({ setLink, style }) {
                 <div className="mr-auto justify-content-between" style={{ paddingRight: 10 }}>
 
                     <div className="dropdown">
-                        <span className='text-white' style={{ fontSize: 18, fontFamily: 'cursive' }}>{user !== '' ? `${user}` : ''}</span>
+                        <span className='text-white' style={{ fontSize: 18, fontFamily: 'cursive' }}>{user !== null ? `${user.username}` : 'Anonymous'}</span>
                         <button
                             className="btn bg-dark dropdown-toggle"
                             style={{ color: 'white' }}
@@ -60,16 +79,24 @@ export default function navbar({ setLink, style }) {
                         </button>
 
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" id="userLogin">
-                            <li onClick={() => route.push('/views/yourngPages/authen', '/authen')}>
-                                Login
-                            </li>
-                            <li onClick={() => {
-                                signOut(auth);
-                                sessionStorage.clear();
-                                router.replace('/')
-                            }}>
-                                Logout
-                            </li>
+                            {/* <li onClick={() => route.push('/views/yourngPages/authen', '/authen')}> */}
+                            {/* <li onClick={() => dispath(openClose_Login(true))}> */}
+                            {user === null ?
+                                (
+                                    <li onClick={() => route.replace('/views/modals/loggin_registerModal', "/authen")}>
+                                        Login
+                                    </li>
+                                ) : (
+
+                                    <li onClick={() => {
+                                        signOut(auth);
+                                        sessionStorage.clear();
+                                        router.replace('/')
+                                    }}>
+                                        Logout
+                                    </li>
+                                )}
+
                         </ul>
                     </div>
                 </div>
