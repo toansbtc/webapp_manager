@@ -31,7 +31,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                     data: {
                         user_token: formData.user_token,
                         role: formData.role,
-                        is_active: formData.is_active
+                        is_active: formData.is_active,
                     },
                 })
                 break;
@@ -40,10 +40,14 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                     data: {
                         role: formData.role,
                         is_active: formData.is_active,
-                        password: formData.password
+                        password: formData.password,
+
                     },
                     where: {
-                        user_token: formData.user_token
+                        user_token: formData.user_token,
+                        AND: {
+                            user_token: 'Admin'
+                        }
                     }
                 })
                 break;

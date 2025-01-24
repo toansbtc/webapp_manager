@@ -14,6 +14,10 @@ const nextConfig = {
         source: '/authen',
         destination: '/views/modals/loggin_registerModal',
       },
+      {
+        source: '/rule',
+        destination: '/views/rule_term',
+      },
     ];
   },
 };

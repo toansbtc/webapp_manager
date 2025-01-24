@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { useState, useEffect, use } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { onAuthStateChanged, signInWithPopup, deleteUser, FacebookAuthProvider } from "firebase/auth";
 import { auth, faceBookProvider, googleprovider, user } from "../../api/config/fireBase"
 import { useDispatch, useSelector } from "react-redux";
 
@@ -13,6 +13,9 @@ import { current } from "@reduxjs/toolkit";
 import { rootState } from "@/pages/api/redux/store";
 import { useLoading } from "../loadingPages/loadingContext";
 import actionDB from "@/pages/api/DB/actionDB";
+
+
+import returnError from '../Function/alert_FB_Login_failed'
 
 const inter = Inter({ subsets: ["vietnamese"] });
 
@@ -29,7 +32,7 @@ export default function loggin_registerModal() {
 
   const [rememberMe, setRememberMe] = useState(false);
   const [loginOrRegister, setLoginOrRegister] = useState('login');
-  const [capchaCde, setCapchaCode] = useState('');
+  const [capchaCode, setCapchaCode] = useState('');
   // const [loading, setIsLoading] = useState(false);
   // const [adminUser, setAdminUser] = useState('');
   // const [password, setPassword] = useState('');
@@ -48,6 +51,15 @@ export default function loggin_registerModal() {
 
 
   useEffect(() => {
+    // const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    // let code = '';
+
+    // for (let i = 0; i < 10; i++) {
+    //   const randomIndex = Math.floor(Math.random() * characters.length);
+    //   code += characters[randomIndex];
+    // }
+
+    // axios.post("/api/DB/CRUBcapchaCode", { "action": actionDB.CREATE, "data": { "capcha_code": code } }).then((data) => { console.log("capcha", data.data) })
 
     if (getItemSession() !== 'undefined')
       router.replace('/')
@@ -76,7 +88,8 @@ export default function loggin_registerModal() {
       'password': form.get('password'),
     }
     setIsLoading(true)
-    const response = await axios.post('/api/DB/CRUDaccountRole', { "action": actionDB.NATIVESQL, "data": { "sql": `select role,user_token as username from account_role where user_token='${formData.email}' and password='${formData.password}'` } })
+    const response = await axios.post('/api/DB/CRUDaccountRole',
+      { "action": actionDB.NATIVESQL, "data": { "sql": `select role,user_token as username from account_role where user_token='${formData.email}' and password='${formData.password}'` } })
 
     const user_data = response.data[0];
 
@@ -95,24 +108,66 @@ export default function loggin_registerModal() {
   }
 
   const fb_Login = async () => {
-    let result;
+
     try {
       setIsLoading(true)
-      result = await signInWithPopup(auth, faceBookProvider)
+      faceBookProvider.addScope("email")
+      faceBookProvider.addScope("pages_messaging")
+      const result = await signInWithPopup(auth, faceBookProvider)
+      const user = result.user
 
-      setItemSession(key_user, result.user)
+      const fbUserID = user.providerData.find((data) => data.providerId === "facebook.com").uid
 
-      // const unsubscriple = onAuthStateChanged(auth, (currentUser) => {
-      //   console.log('use', currentUser)
-      //   if (currentUser) {
-      //     router.replace('/home')
-      //     sessionStorage.setItem(user, JSON.stringify(currentUser))
-      //   }
-      // })
-      // return () => unsubscriple();
+      await axios.post('/api/DB/CRUDaccountRole', { "action": actionDB.GETDATA, "data": { "user_token": fbUserID } })
+        .then((data) => {
+          console.log(data)
+        })
+
+      // const credential=FacebookAuthProvider.credentialFromResult(result);
+      // const access_token=credential.accessToken;
+
+
+
+      // check user had regiter befor login
+      if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+        user.delete();
+      }
+      else {
+        setItemSession(key_user, result.user)
+      }
 
     } catch (error) {
+      returnError(error.code)
       console.log(error)
+    }
+    finally {
+      setIsLoading(false)
+    }
+  }
+  const fb_Register = () => {
+    try {
+      setIsLoading(true)
+      axios.post('/api/DB/CRUBcapchaCode', { "action": actionDB.GETDATA }).then(async (data) => {
+        console.log(data.data)
+        if (data.data.capcha_code === capchaCode) {
+
+          try {
+            const result = await signInWithPopup(auth, faceBookProvider)
+            setItemSession(key_user, result.user)
+          } catch (error) {
+            console.log(error.code)
+            returnError(error.code)
+          }
+
+        }
+        else {
+          alert("capcha code dont exist or used!\n please contact with admin to get valid capcha code ")
+        }
+      })
+      setCapchaCode("");
+
+    } catch (error) {
+      console.log(error.code)
     }
     finally {
       setIsLoading(false)
@@ -206,12 +261,12 @@ export default function loggin_registerModal() {
             )}
             {loginOrRegister === 'register' && (
               <div className="text-center">
-                <div className="d-flex justify-content-center mt-1">
+                <div className="d-flex justify-content-center align-content-center mt-1">
                   <i style={{ color: "blue", fontSize: 35 }} className=" fa-brands fa-facebook" aria-hidden="true"
-                    onClick={fb_Login}></i>
+                    onClick={fb_Register}></i>
                 </div>
                 <div>
-                  <input type="text" placeholder="capcha code" required onChange={(e) => setCapchaCode(e.target.value)} style={{ width: "200px" }} />
+                  <input type="text" placeholder="capcha code" value={capchaCode} required onChange={(e) => setCapchaCode(e.target.value)} style={{ width: "200px" }} />
                 </div>
               </div>
             )}
@@ -222,4 +277,5 @@ export default function loggin_registerModal() {
     </>
   );
 }
+
 

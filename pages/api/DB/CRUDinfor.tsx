@@ -22,7 +22,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
             case ActionDB.GETDATA:
                 result = await prisma.infor.findUnique({
                     where: {
-                        user_token: formData.user_token,
+                        // user_token: formData.user_token,
                         id: formData.id
                     },
                     include: {
@@ -35,7 +35,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                     data: {
 
                         // id_avata_img_path: formData.id_image_path,
-                        user_token: formData.user_token,
+                        // user_token: formData.user_token,
                         self_introduc: formData.self_introduc,
                         position: formData.possition,
                         job: formData.job,
@@ -71,7 +71,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
                         }
                     },
                     where: {
-                        user_token: formData.user_token,
+                        // user_token: formData.user_token,
                         id: formData.id
                     }
                 })
@@ -79,7 +79,7 @@ export default async function prisma_sql(req: NextApiRequest, res: NextApiRespon
             case ActionDB.DELETE:
                 result = await prisma.infor.delete({
                     where: {
-                        user_token: formData.user_token,
+                        // user_token: formData.user_token,
                         id: formData.id
                     },
                     include: {
